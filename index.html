@@ -17,7 +17,6 @@
         body { background-color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #e11d48; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* Animación suave para el modal */
         .fade-in { animation: fadeIn 0.2s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -56,7 +55,9 @@
             Minus: () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/></svg>,
             Lock: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
             Unlock: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>,
-            LogOut: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+            LogOut: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>,
+            Shield: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+            Coffee: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" x2="6" y1="1" y2="4"/><line x1="10" x2="10" y1="1" y2="4"/><line x1="14" x2="14" y1="1" y2="4"/></svg>
         };
 
         // --- FIREBASE SETUP ---
@@ -78,23 +79,23 @@
 
         // --- DATOS DEMO ---
         const DEMO_INCIDENTS = [
-            { date: '18/11/25', plant: 'Camiones', shift: 'T1', imp: 1, noImp: 0, lateStarts: 3, serviceLevel: 94.0, accidents: 1, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 }, 
-            { date: '25/11/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 2, lateStarts: 1, serviceLevel: 97.5, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 2, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 }, 
-            { date: '01/12/25', plant: 'Camiones', shift: 'T1', imp: 2, noImp: 5, lateStarts: 2, serviceLevel: 98.0, accidents: 0, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 1, causeNoImpTraffic: 4, causeNoImpWeather: 0, causeNoImpClosed: 1, causeNoImpOther: 0 },
-            { date: '08/12/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 13, lateStarts: 1, serviceLevel: 98.5, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 10, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 3 },
-            { date: '09/12/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 3, lateStarts: 0, serviceLevel: 99.2, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 3, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '09/12/25', plant: 'Camiones', shift: 'T2', imp: 0, noImp: 2, lateStarts: 2, serviceLevel: 97.8, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 1, causeNoImpWeather: 0, causeNoImpClosed: 1, causeNoImpOther: 0 },
-            { date: '10/12/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 3, lateStarts: 0, serviceLevel: 99.5, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 1, causeNoImpWeather: 2, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '10/12/25', plant: 'Camiones', shift: 'T2', imp: 0, noImp: 1, lateStarts: 0, serviceLevel: 99.0, accidents: 1, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 1, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '11/12/25', plant: 'Camiones', shift: 'T1', imp: 3, noImp: 0, lateStarts: 1, serviceLevel: 96.5, accidents: 0, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 1, causeImpMech: 1, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '11/12/25', plant: 'Camiones', shift: 'T2', imp: 0, noImp: 4, lateStarts: 3, serviceLevel: 95.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 2, causeNoImpWeather: 0, causeNoImpClosed: 2, causeNoImpOther: 0 },
-            { date: '13/12/25', plant: 'Camiones', shift: 'T2', imp: 0, noImp: 13, lateStarts: 0, serviceLevel: 98.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 10, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 3 },
-            { date: '08/12/25', plant: 'Extensión', shift: 'T1', imp: 0, noImp: 7, lateStarts: 0, serviceLevel: 99.0, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 5, causeNoImpWeather: 2, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '08/12/25', plant: 'Extensión', shift: 'T2', imp: 6, noImp: 0, lateStarts: 1, serviceLevel: 92.5, accidents: 1, causeImpSleep: 4, causeImpAccident: 1, causeImpRoute: 1, causeImpMech: 0, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '18/11/25', plant: 'Camiones', shift: 'T1', imp: 1, noImp: 0, lateStarts: 3, serviceLevel: 94.0, safetyScore: 92, breaks: 2, accidents: 1, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 }, 
+            { date: '25/11/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 2, lateStarts: 1, serviceLevel: 97.5, safetyScore: 98, breaks: 5, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 2, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 }, 
+            { date: '01/12/25', plant: 'Camiones', shift: 'T1', imp: 2, noImp: 5, lateStarts: 2, serviceLevel: 98.0, safetyScore: 95, breaks: 4, accidents: 0, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 1, causeNoImpTraffic: 4, causeNoImpWeather: 0, causeNoImpClosed: 1, causeNoImpOther: 0 },
+            { date: '08/12/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 13, lateStarts: 1, serviceLevel: 98.5, safetyScore: 99, breaks: 6, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 10, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 3 },
+            { date: '09/12/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 3, lateStarts: 0, serviceLevel: 99.2, safetyScore: 100, breaks: 5, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 3, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '09/12/25', plant: 'Camiones', shift: 'T2', imp: 0, noImp: 2, lateStarts: 2, serviceLevel: 97.8, safetyScore: 96, breaks: 3, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 1, causeNoImpWeather: 0, causeNoImpClosed: 1, causeNoImpOther: 0 },
+            { date: '10/12/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 3, lateStarts: 0, serviceLevel: 99.5, safetyScore: 100, breaks: 6, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 1, causeNoImpWeather: 2, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '10/12/25', plant: 'Camiones', shift: 'T2', imp: 0, noImp: 1, lateStarts: 0, serviceLevel: 99.0, safetyScore: 98, breaks: 4, accidents: 1, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 1, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '11/12/25', plant: 'Camiones', shift: 'T1', imp: 3, noImp: 0, lateStarts: 1, serviceLevel: 96.5, safetyScore: 88, breaks: 1, accidents: 0, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 1, causeImpMech: 1, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '11/12/25', plant: 'Camiones', shift: 'T2', imp: 0, noImp: 4, lateStarts: 3, serviceLevel: 95.0, safetyScore: 94, breaks: 2, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 2, causeNoImpWeather: 0, causeNoImpClosed: 2, causeNoImpOther: 0 },
+            { date: '13/12/25', plant: 'Camiones', shift: 'T2', imp: 0, noImp: 13, lateStarts: 0, serviceLevel: 98.0, safetyScore: 97, breaks: 5, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 10, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 3 },
+            { date: '08/12/25', plant: 'Extensión', shift: 'T1', imp: 0, noImp: 7, lateStarts: 0, serviceLevel: 99.0, safetyScore: 100, breaks: 7, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 5, causeNoImpWeather: 2, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '08/12/25', plant: 'Extensión', shift: 'T2', imp: 6, noImp: 0, lateStarts: 1, serviceLevel: 92.5, safetyScore: 85, breaks: 0, accidents: 1, causeImpSleep: 4, causeImpAccident: 1, causeImpRoute: 1, causeImpMech: 0, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
         ];
         const DEMO_COMPLAINTS = [
-            { date: '01/12/25', plant: 'Camiones', route: 'Ruta 1', issue: 'Retraso', detail: 'Llegó 15 mins tarde a la parada', action: '-', source: 'Laborales', type: 'Servicio' },
-            { date: '09/12/25', plant: 'Norte', route: 'Valle Verde', issue: 'Actitud', detail: 'Operador no quiso subir personal', action: 'Compromiso', source: 'Laborales', type: 'Conducta' },
+            { date: '01/12/25', plant: 'Camiones', route: 'Ruta 1', issue: 'Retraso', detail: 'Llegó 15 mins tarde a la parada', action: 'Acta Admin', source: 'Laborales', type: 'Servicio' },
+            { date: '09/12/25', plant: 'Norte', route: 'Valle Verde', issue: 'Actitud', detail: 'Operador no quiso subir personal', action: 'Baja', source: 'Laborales', type: 'Conducta' },
             { date: '09/12/25', plant: 'Norte', route: 'Analco', issue: 'Manejo', detail: 'Exceso de velocidad en curva', action: 'Compromiso', source: 'Laborales', type: 'Conducta' },
             { date: '10/12/25', plant: 'Camiones', route: 'Valle Escondido', issue: 'Desvío de ruta', detail: 'No pasó por la avenida principal', action: 'Retroalimentación', source: 'Sindicato', type: 'Servicio' },
         ];
@@ -120,16 +121,16 @@
             if (!data || data.length === 0) return null;
             const values = data.map(d => d[dataKey]); const min = Math.min(...values); const max = Math.max(...values);
             const paddingY = (max - min) * 0.2 || 1; const domainMin = Math.max(0, min - paddingY); const domainMax = max + paddingY; const range = domainMax - domainMin || 1;
-            const width = 200; const height = 80; const margin = 10;
+            const width = 250; const height = 100; const margin = 15;
             const points = data.map((d, i) => `${margin + (i / (data.length - 1)) * (width - 2 * margin)},${height - margin - ((d[dataKey] - domainMin) / range) * (height - 2 * margin)}`).join(" ");
             const dots = data.map((d, i) => ({ x: margin + (i / (data.length - 1)) * (width - 2 * margin), y: height - margin - ((d[dataKey] - domainMin) / range) * (height - 2 * margin), val: d[dataKey], label: d.label }));
             return (
-                <div className="flex flex-col items-center w-full bg-white p-3 rounded-lg border border-slate-200">
-                    <h5 className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">{title}</h5>
+                <div className="flex flex-col items-center w-full bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <h5 className="text-sm font-bold text-slate-600 mb-3 uppercase tracking-wider">{title}</h5>
                     <div className="relative w-full flex justify-center">
                         <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
-                            <polyline points={points} fill="none" stroke={color} strokeWidth="2" />
-                            {dots.map((dot, i) => (<g key={i}><circle cx={dot.x} cy={dot.y} r="3" fill="white" stroke={color} strokeWidth="2" /><text x={dot.x} y={dot.y - 8} textAnchor="middle" fontSize="10" fill="#475569" fontWeight="bold">{dot.val}{suffix}</text><text x={dot.x} y={height + 12} textAnchor="middle" fontSize="9" fill="#94a3b8">{dot.label}</text></g>))}
+                            <polyline points={points} fill="none" stroke={color} strokeWidth="3" />
+                            {dots.map((dot, i) => (<g key={i}><circle cx={dot.x} cy={dot.y} r="4" fill="white" stroke={color} strokeWidth="2" /><text x={dot.x} y={dot.y - 12} textAnchor="middle" fontSize="11" fill="#475569" fontWeight="bold">{dot.val}{suffix}</text><text x={dot.x} y={height + 15} textAnchor="middle" fontSize="10" fill="#94a3b8">{dot.label}</text></g>))}
                         </svg>
                     </div>
                 </div>
@@ -195,7 +196,7 @@
             const [notification, setNotification] = useState(null);
             
             // --- ESTADO DE AUTENTICACIÓN ---
-            const [isAdmin, setIsAdmin] = useState(false); // false = Modo Vista, true = Modo Edición
+            const [isAdmin, setIsAdmin] = useState(false);
             const [showLogin, setShowLogin] = useState(false);
             const [passwordInput, setPasswordInput] = useState('');
             const [loginError, setLoginError] = useState(false);
@@ -229,6 +230,7 @@
                 
                 const aggs = fInc.reduce((acc, c) => ({
                     imp: acc.imp + (c.imp || 0), noImp: acc.noImp + (c.noImp || 0), lateStarts: acc.lateStarts + (c.lateStarts || 0), accidents: acc.accidents + (c.accidents || 0), slSum: acc.slSum + (c.serviceLevel || 0),
+                    breaks: acc.breaks + (c.breaks || 0), safetySum: acc.safetySum + (c.safetyScore || 0),
                     c_imp_sleep: acc.c_imp_sleep + (c.causeImpSleep || 0),
                     c_imp_acc: acc.c_imp_acc + (c.causeImpAccident || 0),
                     c_imp_route: acc.c_imp_route + (c.causeImpRoute || 0),
@@ -237,10 +239,14 @@
                     c_noimp_weath: acc.c_noimp_weath + (c.causeNoImpWeather || 0),
                     c_noimp_closed: acc.c_noimp_closed + (c.causeNoImpClosed || 0),
                     c_noimp_other: acc.c_noimp_other + (c.causeNoImpOther || 0),
-                }), { imp:0, noImp:0, lateStarts:0, accidents:0, slSum:0, c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0 });
+                }), { imp:0, noImp:0, lateStarts:0, accidents:0, slSum:0, breaks:0, safetySum:0, c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0 });
 
                 return {
-                    weekLabel: w.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, accidents: aggs.accidents, serviceLevel: fInc.length > 0 ? parseFloat((aggs.slSum / fInc.length).toFixed(1)) : 100, totalComplaints: fCom.length, incidents: fInc, complaints: fCom, dates: w.dates, aggs
+                    weekLabel: w.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, accidents: aggs.accidents, 
+                    serviceLevel: fInc.length > 0 ? parseFloat((aggs.slSum / fInc.length).toFixed(1)) : 100,
+                    safetyScore: fInc.length > 0 ? parseFloat((aggs.safetySum / fInc.length).toFixed(1)) : 100,
+                    breaks: aggs.breaks,
+                    totalComplaints: fCom.length, incidents: fInc, complaints: fCom, dates: w.dates, aggs
                 };
             };
 
@@ -250,7 +256,7 @@
                 const prev = idx > 0 ? calculateWeekStats(keys[idx - 1]) : null;
                 const trends = keys.slice(Math.max(0, idx - 3), idx + 1).map(k => {
                     const s = calculateWeekStats(k);
-                    return { label: s ? s.weekLabel : k, serviceLevel: s ? s.serviceLevel : 0, lateStarts: s ? s.lateStarts : 0, imp: s ? s.totalImp : 0, accidents: s ? s.accidents : 0, complaints: s ? s.totalComplaints : 0 };
+                    return { label: s ? s.weekLabel : k, serviceLevel: s ? s.serviceLevel : 0, lateStarts: s ? s.lateStarts : 0, imp: s ? s.totalImp : 0, accidents: s ? s.accidents : 0, complaints: s ? s.totalComplaints : 0, safetyScore: s ? s.safetyScore : 0, breaks: s ? s.breaks : 0 };
                 });
 
                 const dailyStats = current ? current.dates.map(d => {
@@ -262,12 +268,21 @@
                         noImp: dayInc.reduce((s, i) => s + (i.noImp || 0), 0), 
                         lateStarts: dayInc.reduce((s, i) => s + (i.lateStarts || 0), 0), 
                         accidents: dayInc.reduce((s, i) => s + (i.accidents || 0), 0),
-                        serviceLevel: dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + i.serviceLevel, 0) / dayInc.length).toFixed(1)) : 100
+                        breaks: dayInc.reduce((s, i) => s + (i.breaks || 0), 0),
+                        serviceLevel: dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + i.serviceLevel, 0) / dayInc.length).toFixed(1)) : 100,
+                        safetyScore: dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + (i.safetyScore || 100), 0) / dayInc.length).toFixed(1)) : 100
                     };
                 }) : [];
 
+                // AGREGACIÓN DE MOTIVOS DE QUEJAS
+                const complaintReasons = current && current.complaints.length > 0 ? Object.entries(
+                    current.complaints.reduce((acc, c) => { acc[c.issue] = (acc[c.issue] || 0) + 1; return acc; }, {})
+                ).map(([label, val], i) => ({
+                    label, val, color: ['#a855f7', '#c084fc', '#d8b4fe', '#f3e8ff', '#7e22ce'][i % 5]
+                })) : [];
+
                 return {
-                    current: current || {}, prev: prev || {}, trends, dailyStats,
+                    current: current || {}, prev: prev || {}, trends, dailyStats, complaintReasons,
                     causes: {
                         imp: [
                             { label: 'Op. Dormido', val: current?.aggs.c_imp_sleep || 0, color: '#f43f5e' },
@@ -326,9 +341,12 @@
 
                     <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
                         {/* KPIs */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
                             <KpiCard title="Nivel Servicio" value={dashboardData.current.serviceLevel} prevValue={dashboardData.prev.serviceLevel} icon={Icons.Activity} colorClass="bg-emerald-500 text-emerald-600" higherIsBetter={true} />
+                            <KpiCard title="Score Seguridad" value={dashboardData.current.safetyScore} prevValue={dashboardData.prev.safetyScore} icon={Icons.Shield} colorClass="bg-blue-500 text-blue-600" higherIsBetter={true} />
                             <KpiCard title="Inicios Tarde" value={dashboardData.current.lateStarts} prevValue={dashboardData.prev.lateStarts} icon={Icons.Clock} colorClass="bg-amber-500 text-amber-600" />
+                            <KpiCard title="Descansos" value={dashboardData.current.breaks} prevValue={dashboardData.prev.breaks} icon={Icons.Coffee} colorClass="bg-cyan-500 text-cyan-600" higherIsBetter={true} />
+                            
                             <KpiCard title="Fallas Imputables" value={dashboardData.current.totalImp || 0} prevValue={dashboardData.prev.totalImp} icon={Icons.BarChart2} colorClass="bg-rose-500 text-rose-600" />
                             <KpiCard title="Percances" value={dashboardData.current.accidents} prevValue={dashboardData.prev.accidents} icon={Icons.AlertOctagon} colorClass="bg-orange-500 text-orange-600" />
                              <KpiCard title="Quejas" value={dashboardData.current.totalComplaints} prevValue={dashboardData.prev.totalComplaints} icon={Icons.MessageSquare} colorClass="bg-purple-500 text-purple-600" />
@@ -349,74 +367,103 @@
                             </div>
                         </div>
 
-                        {/* GRÁFICAS DETALLE */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-white p-6 rounded-xl border shadow-sm"><h3 className="font-bold mb-4 flex gap-2 items-center"><span className="text-amber-500"><Icons.Clock /></span> Inicios Tarde (Diario)</h3><SimpleBarChart data={dashboardData.dailyStats} dataKeys={['lateStarts']} colors={['bg-amber-400']} height={120} /></div>
-                            <div className="bg-white p-6 rounded-xl border shadow-sm"><h3 className="font-bold mb-4 flex gap-2 items-center"><span className="text-orange-500"><Icons.AlertOctagon /></span> Percances (Diario)</h3><SimpleBarChart data={dashboardData.dailyStats} dataKeys={['accidents']} colors={['bg-orange-400']} height={120} /></div>
-                            
-                            {/* GRAFICA NIVEL DE SERVICIO AJUSTADA */}
-                            <div className="bg-white p-6 rounded-xl border shadow-sm">
-                                <h3 className="font-bold mb-4 flex gap-2 items-center"><span className="text-emerald-500"><Icons.Activity /></span> Nivel Servicio (Diario)</h3>
-                                <div className="w-full flex items-end justify-between gap-2 h-[160px]"> {/* Aumenté altura para que quepan las fechas */}
-                                    {dashboardData.dailyStats.map((item, idx) => (
-                                        <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
-                                            <div className="w-full max-w-[20px] bg-slate-100 rounded-t relative h-full flex items-end pt-5">
-                                                <div className={`w-full rounded-t transition-all ${item.serviceLevel >= 98 ? 'bg-emerald-500' : 'bg-red-500'}`} style={{ height: `${item.serviceLevel > 90 ? (item.serviceLevel - 80) * 5 : item.serviceLevel}%` }}></div>
-                                                <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-white px-1 rounded shadow">{item.serviceLevel}%</span>
+                        {/* GRÁFICAS DETALLE (DIARIO) */}
+                        <div>
+                            {/* Fila 1: NS y Score */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div className="bg-white p-4 rounded-xl border shadow-sm">
+                                    <h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-emerald-500"><Icons.Activity /></span> Nivel Servicio (Diario)</h3>
+                                    <div className="w-full flex items-end justify-between gap-2 h-[150px]">
+                                        {dashboardData.dailyStats.map((item, idx) => (
+                                            <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
+                                                <div className="w-full max-w-[20px] bg-slate-100 rounded-t relative h-full flex items-end pt-5">
+                                                    <div className={`w-full rounded-t transition-all ${item.serviceLevel >= 98 ? 'bg-emerald-500' : 'bg-red-500'}`} style={{ height: `${item.serviceLevel > 90 ? (item.serviceLevel - 80) * 5 : item.serviceLevel}%` }}></div>
+                                                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-white px-1 rounded shadow">{item.serviceLevel}%</span>
+                                                </div>
+                                                <div className="mt-2 text-center"><span className="text-[10px] font-bold text-slate-600 block">{item.dayName}</span><span className="text-[9px] text-slate-400 block">{item.date.slice(0,5)}</span></div>
                                             </div>
-                                            <div className="mt-2 text-center">
-                                                <span className="text-[10px] font-bold text-slate-600 block">{item.dayName}</span>
-                                                <span className="text-[9px] text-slate-400 block">{item.date.slice(0,5)}</span>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
+                                <div className="bg-white p-4 rounded-xl border shadow-sm">
+                                    <h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-blue-500"><Icons.Shield /></span> Score Seguridad (Diario)</h3>
+                                    <div className="w-full flex items-end justify-between gap-2 h-[150px]">
+                                        {dashboardData.dailyStats.map((item, idx) => (
+                                            <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
+                                                <div className="w-full max-w-[20px] bg-slate-100 rounded-t relative h-full flex items-end pt-5">
+                                                    <div className={`w-full rounded-t transition-all bg-blue-500`} style={{ height: `${item.safetyScore > 80 ? (item.safetyScore - 70) * 3.3 : item.safetyScore}%` }}></div>
+                                                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-white px-1 rounded shadow">{item.safetyScore}%</span>
+                                                </div>
+                                                <div className="mt-2 text-center"><span className="text-[10px] font-bold text-slate-600 block">{item.dayName}</span><span className="text-[9px] text-slate-400 block">{item.date.slice(0,5)}</span></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Fila 2: Otros Indicadores */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                <div className="bg-white p-4 rounded-xl border shadow-sm"><h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-amber-500"><Icons.Clock /></span> Inicios Tarde</h3><SimpleBarChart data={dashboardData.dailyStats} dataKeys={['lateStarts']} colors={['bg-amber-400']} height={150} /></div>
+                                <div className="bg-white p-4 rounded-xl border shadow-sm"><h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-orange-500"><Icons.AlertOctagon /></span> Percances</h3><SimpleBarChart data={dashboardData.dailyStats} dataKeys={['accidents']} colors={['bg-orange-400']} height={150} /></div>
+                                <div className="bg-white p-4 rounded-xl border shadow-sm"><h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-cyan-500"><Icons.Coffee /></span> Descansos</h3><SimpleBarChart data={dashboardData.dailyStats} dataKeys={['breaks']} colors={['bg-cyan-400']} height={150} /></div>
                             </div>
                         </div>
 
                         {/* TENDENCIAS */}
                         <div>
                             <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2"><span className="bg-slate-200 p-1 rounded"><Icons.BarChart2 /></span> Tendencias (Últimas 4 Semanas)</h3>
-                            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                 <TrendChart title="Nivel Servicio" data={dashboardData.trends} dataKey="serviceLevel" color="#10b981" suffix="%" />
+                                <TrendChart title="Score Seguridad" data={dashboardData.trends} dataKey="safetyScore" color="#3b82f6" suffix="%" />
+                                <TrendChart title="Descansos" data={dashboardData.trends} dataKey="breaks" color="#06b6d4" />
                                 <TrendChart title="Inicios Tarde" data={dashboardData.trends} dataKey="lateStarts" color="#f59e0b" />
-                                <TrendChart title="Fallas Imputables" data={dashboardData.trends} dataKey="imp" color="#f43f5e" />
+                                <TrendChart title="Fallas Imp." data={dashboardData.trends} dataKey="imp" color="#f43f5e" />
                                 <TrendChart title="Percances" data={dashboardData.trends} dataKey="accidents" color="#f97316" />
                                 <TrendChart title="Quejas" data={dashboardData.trends} dataKey="complaints" color="#a855f7" />
                             </div>
                         </div>
 
-                        {/* TABLAS */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* TABLA DE QUEJAS */}
-                            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                                <div className="p-4 bg-slate-50 font-bold border-b flex justify-between"><span className="flex gap-2 items-center"><span className="text-purple-500"><Icons.MessageSquare /></span> Quejas</span> <span className="text-xs bg-purple-100 px-2 py-1 rounded-full">{dashboardData.current.complaints ? dashboardData.current.complaints.length : 0}</span></div>
-                                <div className="max-h-60 overflow-y-auto">
-                                    <table className="w-full text-sm text-left">
-                                        <thead className="sticky top-0 bg-slate-50 text-slate-500"><tr><th className="p-3">Fecha</th><th className="p-3">Ruta</th><th className="p-3">Motivo / Detalle</th>{isAdmin && <th></th>}</tr></thead>
-                                        <tbody className="divide-y">
-                                            {dashboardData.current.complaints && dashboardData.current.complaints.map(c => (
-                                                <tr key={c.id}>
-                                                    <td className="p-3 text-slate-500 align-top">{c.date.slice(0,5)}</td>
-                                                    <td className="p-3 align-top font-medium">{c.route}</td>
-                                                    <td className="p-3 align-top">
-                                                        <div className="text-slate-800 font-bold">{c.issue}</div>
-                                                        <div className="text-xs text-slate-500 mt-1 italic">"{c.detail}"</div>
-                                                    </td>
-                                                    {isAdmin && <td className="p-3 align-top text-right"><button onClick={()=>handleDelete('complaints', c.id)} className="text-red-300 hover:text-red-500"><Icons.Trash2 /></button></td>}
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                        {/* --- TABLAS Y GRÁFICAS DE GESTIÓN --- */}
+                        <div className="space-y-6">
+                            
+                            {/* BLOQUE DE QUEJAS: TABLA + GRÁFICA DE MOTIVOS (Lado a Lado) */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                {/* Tabla de Quejas */}
+                                <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                                    <div className="p-4 bg-slate-50 font-bold border-b flex justify-between"><span className="flex gap-2 items-center"><span className="text-purple-500"><Icons.MessageSquare /></span> Quejas</span> <span className="text-xs bg-purple-100 px-2 py-1 rounded-full">{dashboardData.current.complaints ? dashboardData.current.complaints.length : 0}</span></div>
+                                    <div className="max-h-60 overflow-y-auto">
+                                        <table className="w-full text-sm text-left">
+                                            <thead className="sticky top-0 bg-slate-50 text-slate-500"><tr><th className="p-3">Fecha</th><th className="p-3">Ruta</th><th className="p-3">Motivo / Detalle</th><th className="p-3">Acción</th>{isAdmin && <th></th>}</tr></thead>
+                                            <tbody className="divide-y">
+                                                {dashboardData.current.complaints && dashboardData.current.complaints.map(c => (
+                                                    <tr key={c.id}>
+                                                        <td className="p-3 text-slate-500 align-top">{c.date.slice(0,5)}</td>
+                                                        <td className="p-3 align-top font-medium">{c.route}</td>
+                                                        <td className="p-3 align-top">
+                                                            <div className="text-slate-800 font-bold">{c.issue}</div>
+                                                            <div className="text-xs text-slate-500 mt-1 italic">"{c.detail}"</div>
+                                                        </td>
+                                                        <td className="p-3 align-top text-xs"><span className="bg-slate-100 px-2 py-1 rounded border border-slate-200">{c.action || '-'}</span></td>
+                                                        {isAdmin && <td className="p-3 align-top text-right"><button onClick={()=>handleDelete('complaints', c.id)} className="text-red-300 hover:text-red-500"><Icons.Trash2 /></button></td>}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                {/* Gráfica de Motivos de Quejas */}
+                                <div className="lg:col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center">
+                                    <SimpleDonutChart title="Motivos de Quejas" total={dashboardData.current.totalComplaints || 0} data={dashboardData.complaintReasons} />
                                 </div>
                             </div>
-                            
-                            {/* TABLA DE REPORTES */}
+
+                            {/* TABLA DE REPORTES (ABAJO Y ANCHO COMPLETO) */}
                             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                                <div className="p-4 bg-slate-50 font-bold border-b flex justify-between items-center"><span className="flex gap-2 items-center"><span className="text-rose-500"><Icons.AlertTriangle /></span> Reportes</span> <span className="text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded-full">{dashboardData.current.incidents ? dashboardData.current.incidents.length : 0}</span></div>
+                                <div className="p-4 bg-slate-50 font-bold border-b flex justify-between items-center"><span className="flex gap-2 items-center"><span className="text-rose-500"><Icons.AlertTriangle /></span> Reportes Diarios</span> <span className="text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded-full">{dashboardData.current.incidents ? dashboardData.current.incidents.length : 0}</span></div>
                                 <div className="max-h-60 overflow-y-auto">
                                     <table className="w-full text-sm text-left">
-                                        <thead className="sticky top-0 bg-slate-50 text-slate-500 shadow-sm z-10"><tr><th className="p-3">Fecha</th><th className="p-3">Planta</th><th className="p-3 text-center">Fallas</th><th className="p-3 text-center">N.S.</th><th className="p-3 text-center bg-amber-50 text-amber-600">I.T.</th><th className="p-3 text-center bg-orange-50 text-orange-600">Perc.</th>{isAdmin && <th className="p-3"></th>}</tr></thead>
+                                        <thead className="sticky top-0 bg-slate-50 text-slate-500 shadow-sm z-10"><tr><th className="p-3">Fecha</th><th className="p-3">Planta</th><th className="p-3 text-center">Fallas</th><th className="p-3 text-center">N.S.</th><th className="p-3 text-center bg-blue-50 text-blue-600">Seg%</th><th className="p-3 text-center bg-cyan-50 text-cyan-600">Desc.</th>{isAdmin && <th className="p-3"></th>}</tr></thead>
                                         <tbody className="divide-y">
                                             {dashboardData.current.incidents && dashboardData.current.incidents.map(inc => (
                                                 <tr key={inc.id} className="hover:bg-slate-50">
@@ -424,8 +471,8 @@
                                                     <td className="p-3"><div className="font-bold text-slate-700">{inc.plant}</div><div className="text-xs text-slate-400">{inc.shift}</div></td>
                                                     <td className="p-3 text-center"><span className="font-bold text-red-700">{inc.imp}</span> / <span className="text-slate-600 font-bold">{inc.noImp}</span></td>
                                                     <td className="p-3 text-center"><span className={`font-bold ${inc.serviceLevel >= 98 ? 'text-emerald-600' : 'text-red-600'}`}>{inc.serviceLevel}%</span></td>
-                                                    <td className="p-3 text-center font-bold text-amber-600 bg-amber-50/30">{inc.lateStarts}</td>
-                                                    <td className="p-3 text-center font-bold text-orange-600 bg-orange-50/30">{inc.accidents}</td>
+                                                    <td className="p-3 text-center font-bold text-blue-600 bg-blue-50/30">{inc.safetyScore || 100}%</td>
+                                                    <td className="p-3 text-center font-bold text-cyan-600 bg-cyan-50/30">{inc.breaks || 0}</td>
                                                     {isAdmin && <td className="p-3 text-right"><button onClick={()=>handleDelete('incidents', inc.id)} className="text-slate-300 hover:text-red-500"><Icons.Trash2 /></button></td>}
                                                 </tr>
                                             ))}
@@ -433,6 +480,7 @@
                                     </table>
                                 </div>
                             </div>
+
                         </div>
                     </main>
 
@@ -452,6 +500,8 @@
                                     imp, noImp, 
                                     lateStarts: parseInt(data.lateStarts)||0, 
                                     serviceLevel: parseFloat(data.serviceLevel)||100, 
+                                    safetyScore: parseFloat(data.safetyScore)||100,
+                                    breaks: parseInt(data.breaks)||0,
                                     accidents: parseInt(data.accidents)||0,
                                     causeImpSleep: parseInt(data.causeImpSleep)||0,
                                     causeImpAccident: parseInt(data.causeImpAccident)||0,
@@ -485,7 +535,7 @@
 
         const ModalForm = ({ close, plants, onSaveIncident, onSaveComplaint, onSeed }) => {
             const [tab, setTab] = useState('incident'); 
-            const [formData, setFormData] = useState({ date: new Date().toISOString().split('T')[0], plant: 'Camiones', shift: 'T1', serviceLevel: 99.0, lateStarts: 0, accidents: 0, 
+            const [formData, setFormData] = useState({ date: new Date().toISOString().split('T')[0], plant: 'Camiones', shift: 'T1', serviceLevel: 99.0, safetyScore: 100, breaks: 0, lateStarts: 0, accidents: 0, 
                 causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, 
                 causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0, 
                 route: '', issue: 'Retraso', detail: '', action: '', source: 'Laborales', type: 'Servicio' 
@@ -500,12 +550,17 @@
                             <div className="grid grid-cols-2 gap-4"><div><label className="text-xs font-bold text-slate-500">Fecha</label><input type="date" name="date" required value={formData.date} onChange={handleChange} className="w-full border rounded p-2 text-sm"/></div><div><label className="text-xs font-bold text-slate-500">Planta</label><select name="plant" value={formData.plant} onChange={handleChange} className="w-full border rounded p-2 text-sm">{plants.map(p=><option key={p}>{p}</option>)}</select></div></div>
                             {tab === 'incident' ? (
                                 <>
-                                    <div className="grid grid-cols-3 gap-4 bg-slate-50 p-3 rounded border">
-                                        <div><label className="text-xs font-bold text-slate-500">Turno</label><select name="shift" value={formData.shift} onChange={handleChange} className="w-full border rounded p-1 text-sm"><option>T1</option><option>T2</option><option>T3</option></select></div>
-                                        <div><label className="text-xs font-bold text-slate-500">Nivel Servicio %</label><input type="number" step="0.1" name="serviceLevel" value={formData.serviceLevel} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
-                                        <div><label className="text-xs font-bold text-slate-500">Inicios Tarde</label><input type="number" name="lateStarts" value={formData.lateStarts} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
+                                    <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 rounded border mb-2">
+                                         <div><label className="text-xs font-bold text-emerald-600">Nivel Servicio %</label><input type="number" step="0.1" name="serviceLevel" value={formData.serviceLevel} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-emerald-600"/></div>
+                                         <div><label className="text-xs font-bold text-blue-600">Score Seguridad %</label><input type="number" step="0.1" name="safetyScore" value={formData.safetyScore} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-blue-600"/></div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-4 gap-2 bg-slate-50 p-3 rounded border">
+                                        <div><label className="text-xs font-bold text-slate-500">Turno</label><select name="shift" value={formData.shift} onChange={handleChange} className="w-full border rounded p-1 text-sm"><option>T1</option><option>T2</option><option>T3</option></select></div>
+                                        <div><label className="text-xs font-bold text-slate-500">Inicios Tarde</label><input type="number" name="lateStarts" value={formData.lateStarts} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
+                                        <div><label className="text-xs font-bold text-slate-500">Percances</label><input type="number" name="accidents" value={formData.accidents} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
+                                        <div><label className="text-xs font-bold text-slate-500">Descansos</label><input type="number" name="breaks" value={formData.breaks} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4 mt-2">
                                         <div className="border-rose-100 border p-2 bg-rose-50/50 rounded"><h4 className="text-xs font-bold text-rose-600 mb-2">Imputables</h4><div className="space-y-2">
                                             <div className="flex justify-between items-center"><label className="text-xs">Op. Dormido</label><input type="number" name="causeImpSleep" value={formData.causeImpSleep} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
                                             <div className="flex justify-between items-center"><label className="text-xs">Siniestro</label><input type="number" name="causeImpAccident" value={formData.causeImpAccident} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
@@ -519,12 +574,15 @@
                                             <div className="flex justify-between items-center"><label className="text-xs">Otros</label><input type="number" name="causeNoImpOther" value={formData.causeNoImpOther} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
                                         </div></div>
                                     </div>
-                                    <div><label className="text-xs font-bold text-slate-500">Percances</label><input type="number" name="accidents" value={formData.accidents} onChange={handleChange} className="w-full border rounded p-2 text-sm"/></div>
                                 </>
                             ) : (
                                 <>
                                     <input type="text" name="route" placeholder="Ruta" value={formData.route} onChange={handleChange} className="w-full border rounded p-2 text-sm"/>
-                                    <div className="grid grid-cols-2 gap-4"><select name="issue" value={formData.issue} onChange={handleChange} className="w-full border rounded p-2 text-sm"><option>Actitud</option><option>Retraso</option><option>Falla</option><option>Manejo</option><option>Desvío de ruta</option></select><select name="source" value={formData.source} onChange={handleChange} className="w-full border rounded p-2 text-sm"><option>Laborales</option><option>Sindicato</option></select></div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <select name="issue" value={formData.issue} onChange={handleChange} className="w-full border rounded p-2 text-sm"><option>Actitud</option><option>Retraso</option><option>Falla</option><option>Manejo</option><option>Desvío de ruta</option></select>
+                                        <select name="source" value={formData.source} onChange={handleChange} className="w-full border rounded p-2 text-sm"><option>Laborales</option><option>Sindicato</option></select>
+                                    </div>
+                                    <div><label className="text-xs font-bold text-slate-500">Acción Tomada</label><input type="text" name="action" placeholder="Ej. Acta administrativa, Compromiso..." value={formData.action} onChange={handleChange} className="w-full border rounded p-2 text-sm"/></div>
                                     <textarea name="detail" placeholder="Detalle de la queja..." rows="3" value={formData.detail} onChange={handleChange} className="w-full border rounded p-2 text-sm"></textarea>
                                 </>
                             )}
