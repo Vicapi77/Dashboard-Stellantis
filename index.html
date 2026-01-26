@@ -623,7 +623,13 @@
                                 <>
                                     <input type="text" name="route" placeholder="Ruta" value={formData.route} onChange={handleChange} className="w-full border rounded p-2 text-sm"/>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <select name="issue" value={formData.issue} onChange={handleChange} className="w-full border rounded p-2 text-sm"><option>Actitud</option><option>Retraso</option><option>Falla</option><option>Manejo</option><option>Desvío de ruta</option></select>
+                                        <select name="issue" value={formData.issue} onChange={handleChange} className="w-full border rounded p-2 text-sm">
+                                            <option>Actitud</option>
+                                            <option>Retraso</option>
+                                            <option>Falla de unidad</option>
+                                            <option>Manejo</option>
+                                            <option>Desvío de ruta</option>
+                                        </select>
                                         <select name="source" value={formData.source} onChange={handleChange} className="w-full border rounded p-2 text-sm"><option>Laborales</option><option>Sindicato</option></select>
                                     </div>
                                     <div><label className="text-xs font-bold text-slate-500">Acción Tomada</label><input type="text" name="action" placeholder="Ej. Acta administrativa, Compromiso..." value={formData.action} onChange={handleChange} className="w-full border rounded p-2 text-sm"/></div>
