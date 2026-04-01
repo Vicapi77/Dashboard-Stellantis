@@ -80,25 +80,11 @@
 
         // --- DATOS DEMO ---
         const DEMO_INCIDENTS = [
-            { date: '18/11/25', plant: 'Camiones', shift: 'T1', imp: 1, noImp: 0, lateStarts: 3, serviceLevel: 94.0, safetyScore: 92, onTimeStarts: 90, accidents: 1, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 }, 
-            { date: '25/11/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 2, lateStarts: 1, serviceLevel: 97.5, safetyScore: 98, onTimeStarts: 98, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 2, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 }, 
-            { date: '01/12/25', plant: 'Camiones', shift: 'T1', imp: 2, noImp: 5, lateStarts: 2, serviceLevel: 98.0, safetyScore: 95, onTimeStarts: 95, accidents: 0, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 1, causeNoImpTraffic: 4, causeNoImpWeather: 0, causeNoImpClosed: 1, causeNoImpOther: 0 },
-            { date: '08/12/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 13, lateStarts: 1, serviceLevel: 98.5, safetyScore: 99, onTimeStarts: 99, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 10, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 3 },
-            { date: '09/12/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 3, lateStarts: 0, serviceLevel: 99.2, safetyScore: 100, onTimeStarts: 100, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 3, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '09/12/25', plant: 'Camiones', shift: 'T2', imp: 0, noImp: 2, lateStarts: 2, serviceLevel: 97.8, safetyScore: 96, onTimeStarts: 96, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 1, causeNoImpWeather: 0, causeNoImpClosed: 1, causeNoImpOther: 0 },
-            { date: '10/12/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 3, lateStarts: 0, serviceLevel: 99.5, safetyScore: 100, onTimeStarts: 100, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 1, causeNoImpWeather: 2, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '10/12/25', plant: 'Camiones', shift: 'T2', imp: 0, noImp: 1, lateStarts: 0, serviceLevel: 99.0, safetyScore: 98, onTimeStarts: 100, accidents: 1, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 1, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '11/12/25', plant: 'Camiones', shift: 'T1', imp: 3, noImp: 0, lateStarts: 1, serviceLevel: 96.5, safetyScore: 88, onTimeStarts: 98, accidents: 0, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 1, causeImpMech: 1, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '11/12/25', plant: 'Camiones', shift: 'T2', imp: 0, noImp: 4, lateStarts: 3, serviceLevel: 95.0, safetyScore: 94, onTimeStarts: 92, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 2, causeNoImpWeather: 0, causeNoImpClosed: 2, causeNoImpOther: 0 },
-            { date: '13/12/25', plant: 'Camiones', shift: 'T2', imp: 0, noImp: 13, lateStarts: 0, serviceLevel: 98.0, safetyScore: 97, onTimeStarts: 100, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 10, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 3 },
-            { date: '08/12/25', plant: 'Extensión', shift: 'T1', imp: 0, noImp: 7, lateStarts: 0, serviceLevel: 99.0, safetyScore: 100, onTimeStarts: 100, accidents: 0, causeImpSleep: 0, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0, causeNoImpTraffic: 5, causeNoImpWeather: 2, causeNoImpClosed: 0, causeNoImpOther: 0 },
-            { date: '08/12/25', plant: 'Extensión', shift: 'T2', imp: 6, noImp: 0, lateStarts: 1, serviceLevel: 92.5, safetyScore: 85, onTimeStarts: 97, accidents: 1, causeImpSleep: 4, causeImpAccident: 1, causeImpRoute: 1, causeImpMech: 0, causeNoImpTraffic: 0, causeNoImpWeather: 0, causeNoImpClosed: 0, causeNoImpOther: 0 },
+            { date: '18/11/25', plant: 'Camiones', shift: 'T1', imp: 1, noImp: 0, lateStarts: 3, serviceLevel: 94.0, safetyScore: 92, onTimeStarts: 90, accidents: 1, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0 }, 
+            { date: '25/11/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 2, lateStarts: 1, serviceLevel: 97.5, safetyScore: 98, onTimeStarts: 98, accidents: 0, causeNoImpTraffic: 2 }, 
         ];
         const DEMO_COMPLAINTS = [
             { date: '01/12/25', plant: 'Camiones', route: 'Ruta 1', issue: 'Retraso', detail: 'Llegó 15 mins tarde a la parada', action: 'Acta Admin', source: 'Laborales', type: 'Servicio' },
-            { date: '09/12/25', plant: 'Norte', route: 'Valle Verde', issue: 'Actitud', detail: 'Operador no quiso subir personal', action: 'Baja', source: 'Laborales', type: 'Conducta' },
-            { date: '09/12/25', plant: 'Norte', route: 'Analco', issue: 'Manejo', detail: 'Exceso de velocidad en curva', action: 'Compromiso', source: 'Laborales', type: 'Conducta' },
-            { date: '10/12/25', plant: 'Camiones', route: 'Valle Escondido', issue: 'Desvío de ruta', detail: 'No pasó por la avenida principal', action: 'Retroalimentación', source: 'Sindicato', type: 'Servicio' },
         ];
 
         const PLANTS = ['Todas', 'Camiones', 'Extensión', 'Van', 'Norte', 'Sur'];
@@ -142,17 +128,20 @@
             if (total === 0) return <div className="h-40 flex items-center justify-center text-slate-300 text-xs">Sin datos</div>;
             let acc = 0; const r = 40; const c = 50;
             const segs = data.map(d => {
-                const p = d.val / total; if(p===1) return { d: `M 50 50 m -40, 0 a 40,40 0 1,0 80,0 a 40,40 0 1,0 -80,0`, color: d.color, label: d.label, val: d.val, percent: 100 };
+                const p = d.val / total; if(p===0) return null;
+                if(p===1) return { d: `M 50 50 m -40, 0 a 40,40 0 1,0 80,0 a 40,40 0 1,0 -80,0`, color: d.color, label: d.label, val: d.val, percent: 100 };
                 const a1 = acc * 360; const a2 = (acc + p) * 360; acc += p;
                 const x1 = c + r * Math.cos(Math.PI * a1 / 180); const y1 = c + r * Math.sin(Math.PI * a1 / 180);
                 const x2 = c + r * Math.cos(Math.PI * a2 / 180); const y2 = c + r * Math.sin(Math.PI * a2 / 180);
                 return { d: `M ${c} ${c} L ${x1} ${y1} A ${r} ${r} 0 ${p > 0.5 ? 1 : 0} 1 ${x2} ${y2} Z`, color: d.color, label: d.label, val: d.val, percent: (p*100).toFixed(0) };
-            });
+            }).filter(Boolean);
             return (
                 <div className="flex flex-col items-center">
                     <h4 className="text-xs font-bold text-slate-500 mb-2 uppercase">{title}</h4>
                     <div className="relative w-32 h-32"><svg viewBox="0 0 100 100" className="transform -rotate-90 w-full h-full">{segs.map((s, i) => <path key={i} d={s.d} fill={s.color} stroke="white" strokeWidth="1" />)}<circle cx="50" cy="50" r="25" fill="white" /></svg><div className="absolute inset-0 flex items-center justify-center flex-col"><span className="text-xl font-bold text-slate-700">{total}</span></div></div>
-                    <div className="w-full mt-4 space-y-1">{segs.map((s, i) => s.val > 0 && (<div key={i} className="flex justify-between text-xs items-center"><div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full" style={{backgroundColor: s.color}}></span><span className="text-slate-600">{s.label}</span></div><span className="font-bold text-slate-800">{s.val} ({s.percent}%)</span></div>))}</div>
+                    <div className="w-full mt-4 space-y-1 max-h-40 overflow-y-auto pr-1">
+                        {segs.map((s, i) => s.val > 0 && (<div key={i} className="flex justify-between text-xs items-center"><div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full min-w-[8px]" style={{backgroundColor: s.color}}></span><span className="text-slate-600 truncate">{s.label}</span></div><span className="font-bold text-slate-800 ml-2">{s.val} ({s.percent}%)</span></div>))}
+                    </div>
                 </div>
             );
         };
@@ -232,8 +221,14 @@
                     imp: acc.imp + (c.imp || 0), noImp: acc.noImp + (c.noImp || 0), lateStarts: acc.lateStarts + (c.lateStarts || 0), accidents: acc.accidents + (c.accidents || 0), slSum: acc.slSum + (c.serviceLevel || 0),
                     onTimeSum: acc.onTimeSum + (c.onTimeStarts || 0), safetySum: acc.safetySum + (c.safetyScore || 0),
                     c_imp_sleep: acc.c_imp_sleep + (c.causeImpSleep || 0), c_imp_acc: acc.c_imp_acc + (c.causeImpAccident || 0), c_imp_route: acc.c_imp_route + (c.causeImpRoute || 0), c_imp_mech: acc.c_imp_mech + (c.causeImpMech || 0),
+                    c_imp_sup: acc.c_imp_sup + (c.causeImpSupervisor || 0), c_imp_att: acc.c_imp_att + (c.causeImpAttitude || 0), c_imp_driv: acc.c_imp_driv + (c.causeImpDriving || 0), c_imp_flat: acc.c_imp_flat + (c.causeImpFlatTire || 0), c_imp_alc: acc.c_imp_alc + (c.causeImpAlcohol || 0), c_imp_diesel: acc.c_imp_diesel + (c.causeImpDiesel || 0), c_imp_opth: acc.c_imp_opth + (c.causeImpOpTheme || 0),
+                    
                     c_noimp_traf: acc.c_noimp_traf + (c.causeNoImpTraffic || 0), c_noimp_weath: acc.c_noimp_weath + (c.causeNoImpWeather || 0), c_noimp_closed: acc.c_noimp_closed + (c.causeNoImpClosed || 0), c_noimp_other: acc.c_noimp_other + (c.causeNoImpOther || 0),
-                }), { imp:0, noImp:0, lateStarts:0, accidents:0, slSum:0, onTimeSum:0, safetySum:0, c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0 });
+                    c_noimp_sr: acc.c_noimp_sr + (c.causeNoImpCrashNoResp || 0), c_noimp_train: acc.c_noimp_train + (c.causeNoImpTrain || 0), c_noimp_vand: acc.c_noimp_vand + (c.causeNoImpVandalism || 0), c_noimp_over: acc.c_noimp_over + (c.causeNoImpOvercapacity || 0), c_noimp_event: acc.c_noimp_event + (c.causeNoImpPublicEvent || 0), c_noimp_prot: acc.c_noimp_prot + (c.causeNoImpProtest || 0), c_noimp_work: acc.c_noimp_work + (c.causeNoImpPublicWork || 0), c_noimp_3rd: acc.c_noimp_3rd + (c.causeNoImpThirdPartyCrash || 0)
+                }), { imp:0, noImp:0, lateStarts:0, accidents:0, slSum:0, onTimeSum:0, safetySum:0, 
+                    c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_imp_sup:0, c_imp_att:0, c_imp_driv:0, c_imp_flat:0, c_imp_alc:0, c_imp_diesel:0, c_imp_opth:0, 
+                    c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0, c_noimp_sr:0, c_noimp_train:0, c_noimp_vand:0, c_noimp_over:0, c_noimp_event:0, c_noimp_prot:0, c_noimp_work:0, c_noimp_3rd:0 
+                });
 
                 return {
                     weekLabel: w.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, accidents: aggs.accidents, 
@@ -270,8 +265,33 @@
                 return {
                     current: current || {}, prev: prev || {}, trends, dailyStats, complaintReasons,
                     causes: {
-                        imp: [{ label: 'Op. Dormido', val: current?.aggs.c_imp_sleep || 0, color: '#f43f5e' }, { label: 'Siniestro', val: current?.aggs.c_imp_acc || 0, color: '#fb7185' }, { label: 'Desvío Ruta', val: current?.aggs.c_imp_route || 0, color: '#fda4af' }, { label: 'Falla Mec.', val: current?.aggs.c_imp_mech || 0, color: '#be123c' }],
-                        noImp: [{ label: 'Tráfico', val: current?.aggs.c_noimp_traf || 0, color: '#64748b' }, { label: 'Calle Cerrada', val: current?.aggs.c_noimp_closed || 0, color: '#475569' }, { label: 'Clima', val: current?.aggs.c_noimp_weath || 0, color: '#94a3b8' }, { label: 'Otros', val: current?.aggs.c_noimp_other || 0, color: '#cbd5e1' }]
+                        imp: [
+                            { label: 'Op. Dormido', val: current?.aggs.c_imp_sleep || 0, color: '#f43f5e' }, 
+                            { label: 'Siniestro', val: current?.aggs.c_imp_acc || 0, color: '#fb7185' }, 
+                            { label: 'Desvío Ruta', val: current?.aggs.c_imp_route || 0, color: '#fda4af' }, 
+                            { label: 'Falla Mec.', val: current?.aggs.c_imp_mech || 0, color: '#be123c' },
+                            { label: 'Supervisor', val: current?.aggs.c_imp_sup || 0, color: '#e11d48' },
+                            { label: 'Actitud de Op', val: current?.aggs.c_imp_att || 0, color: '#9f1239' },
+                            { label: 'Mal Manejo', val: current?.aggs.c_imp_driv || 0, color: '#fecdd3' },
+                            { label: 'Ponchadura', val: current?.aggs.c_imp_flat || 0, color: '#881337' },
+                            { label: 'Alcoholemia', val: current?.aggs.c_imp_alc || 0, color: '#ef4444' },
+                            { label: 'Diesel', val: current?.aggs.c_imp_diesel || 0, color: '#dc2626' },
+                            { label: 'Tema de Op.', val: current?.aggs.c_imp_opth || 0, color: '#b91c1c' }
+                        ],
+                        noImp: [
+                            { label: 'Tráfico', val: current?.aggs.c_noimp_traf || 0, color: '#64748b' }, 
+                            { label: 'Calle Cerrada', val: current?.aggs.c_noimp_closed || 0, color: '#475569' }, 
+                            { label: 'Clima', val: current?.aggs.c_noimp_weath || 0, color: '#94a3b8' }, 
+                            { label: 'Otros', val: current?.aggs.c_noimp_other || 0, color: '#cbd5e1' },
+                            { label: 'Percance S/R', val: current?.aggs.c_noimp_sr || 0, color: '#334155' },
+                            { label: 'Tren', val: current?.aggs.c_noimp_train || 0, color: '#e2e8f0' },
+                            { label: 'Vandalismo', val: current?.aggs.c_noimp_vand || 0, color: '#1e293b' },
+                            { label: 'Sobreaforo', val: current?.aggs.c_noimp_over || 0, color: '#f1f5f9' },
+                            { label: 'Evento Publico', val: current?.aggs.c_noimp_event || 0, color: '#0f172a' },
+                            { label: 'Manifestación', val: current?.aggs.c_noimp_prot || 0, color: '#9ca3af' },
+                            { label: 'Obra Publica', val: current?.aggs.c_noimp_work || 0, color: '#d1d5db' },
+                            { label: 'Accidente Terceros', val: current?.aggs.c_noimp_3rd || 0, color: '#4b5563' }
+                        ]
                     }
                 };
             }, [incidents, complaints, selectedWeek, selectedPlant]);
@@ -493,8 +513,8 @@
                             initialTab={modalTab}
                             onSaveIncident={(data) => {
                                 const [y, m, d] = data.date.split('-');
-                                const imp = (parseInt(data.causeImpSleep)||0) + (parseInt(data.causeImpAccident)||0) + (parseInt(data.causeImpRoute)||0) + (parseInt(data.causeImpMech)||0);
-                                const noImp = (parseInt(data.causeNoImpTraffic)||0) + (parseInt(data.causeNoImpWeather)||0) + (parseInt(data.causeNoImpClosed)||0) + (parseInt(data.causeNoImpOther)||0);
+                                const imp = (parseInt(data.causeImpSleep)||0) + (parseInt(data.causeImpAccident)||0) + (parseInt(data.causeImpRoute)||0) + (parseInt(data.causeImpMech)||0) + (parseInt(data.causeImpSupervisor)||0) + (parseInt(data.causeImpAttitude)||0) + (parseInt(data.causeImpDriving)||0) + (parseInt(data.causeImpFlatTire)||0) + (parseInt(data.causeImpAlcohol)||0) + (parseInt(data.causeImpDiesel)||0) + (parseInt(data.causeImpOpTheme)||0);
+                                const noImp = (parseInt(data.causeNoImpTraffic)||0) + (parseInt(data.causeNoImpWeather)||0) + (parseInt(data.causeNoImpClosed)||0) + (parseInt(data.causeNoImpOther)||0) + (parseInt(data.causeNoImpCrashNoResp)||0) + (parseInt(data.causeNoImpTrain)||0) + (parseInt(data.causeNoImpVandalism)||0) + (parseInt(data.causeNoImpOvercapacity)||0) + (parseInt(data.causeNoImpPublicEvent)||0) + (parseInt(data.causeNoImpProtest)||0) + (parseInt(data.causeNoImpPublicWork)||0) + (parseInt(data.causeNoImpThirdPartyCrash)||0);
                                 
                                 const payload = { 
                                     ...data, 
@@ -505,8 +525,12 @@
                                     safetyScore: parseFloat(data.safetyScore)||100,
                                     onTimeStarts: parseFloat(data.onTimeStarts)||100,
                                     accidents: parseInt(data.accidents)||0,
+                                    
                                     causeImpSleep: parseInt(data.causeImpSleep)||0, causeImpAccident: parseInt(data.causeImpAccident)||0, causeImpRoute: parseInt(data.causeImpRoute)||0, causeImpMech: parseInt(data.causeImpMech)||0,
-                                    causeNoImpTraffic: parseInt(data.causeNoImpTraffic)||0, causeNoImpWeather: parseInt(data.causeNoImpWeather)||0, causeNoImpClosed: parseInt(data.causeNoImpClosed)||0, causeNoImpOther: parseInt(data.causeNoImpOther)||0
+                                    causeImpSupervisor: parseInt(data.causeImpSupervisor)||0, causeImpAttitude: parseInt(data.causeImpAttitude)||0, causeImpDriving: parseInt(data.causeImpDriving)||0, causeImpFlatTire: parseInt(data.causeImpFlatTire)||0, causeImpAlcohol: parseInt(data.causeImpAlcohol)||0, causeImpDiesel: parseInt(data.causeImpDiesel)||0, causeImpOpTheme: parseInt(data.causeImpOpTheme)||0,
+                                    
+                                    causeNoImpTraffic: parseInt(data.causeNoImpTraffic)||0, causeNoImpWeather: parseInt(data.causeNoImpWeather)||0, causeNoImpClosed: parseInt(data.causeNoImpClosed)||0, causeNoImpOther: parseInt(data.causeNoImpOther)||0,
+                                    causeNoImpCrashNoResp: parseInt(data.causeNoImpCrashNoResp)||0, causeNoImpTrain: parseInt(data.causeNoImpTrain)||0, causeNoImpVandalism: parseInt(data.causeNoImpVandalism)||0, causeNoImpOvercapacity: parseInt(data.causeNoImpOvercapacity)||0, causeNoImpPublicEvent: parseInt(data.causeNoImpPublicEvent)||0, causeNoImpProtest: parseInt(data.causeNoImpProtest)||0, causeNoImpPublicWork: parseInt(data.causeNoImpPublicWork)||0, causeNoImpThirdPartyCrash: parseInt(data.causeNoImpThirdPartyCrash)||0
                                 };
 
                                 if (editingItem) {
@@ -563,9 +587,16 @@
                 onTimeStarts: initialData?.onTimeStarts !== undefined ? initialData.onTimeStarts : 100, 
                 lateStarts: initialData?.lateStarts || 0, 
                 accidents: initialData?.accidents || 0, 
-                causeImpSleep: initialData?.causeImpSleep || 0, causeImpAccident: initialData?.causeImpAccident || 0, causeImpRoute: initialData?.causeImpRoute || 0, causeImpMech: initialData?.causeImpMech || 0, 
-                causeNoImpTraffic: initialData?.causeNoImpTraffic || 0, causeNoImpWeather: initialData?.causeNoImpWeather || 0, causeNoImpClosed: initialData?.causeNoImpClosed || 0, causeNoImpOther: initialData?.causeNoImpOther || 0, 
                 
+                // Imputables
+                causeImpSleep: initialData?.causeImpSleep || 0, causeImpAccident: initialData?.causeImpAccident || 0, causeImpRoute: initialData?.causeImpRoute || 0, causeImpMech: initialData?.causeImpMech || 0, 
+                causeImpSupervisor: initialData?.causeImpSupervisor || 0, causeImpAttitude: initialData?.causeImpAttitude || 0, causeImpDriving: initialData?.causeImpDriving || 0, causeImpFlatTire: initialData?.causeImpFlatTire || 0, causeImpAlcohol: initialData?.causeImpAlcohol || 0, causeImpDiesel: initialData?.causeImpDiesel || 0, causeImpOpTheme: initialData?.causeImpOpTheme || 0,
+                
+                // No Imputables
+                causeNoImpTraffic: initialData?.causeNoImpTraffic || 0, causeNoImpWeather: initialData?.causeNoImpWeather || 0, causeNoImpClosed: initialData?.causeNoImpClosed || 0, causeNoImpOther: initialData?.causeNoImpOther || 0, 
+                causeNoImpCrashNoResp: initialData?.causeNoImpCrashNoResp || 0, causeNoImpTrain: initialData?.causeNoImpTrain || 0, causeNoImpVandalism: initialData?.causeNoImpVandalism || 0, causeNoImpOvercapacity: initialData?.causeNoImpOvercapacity || 0, causeNoImpPublicEvent: initialData?.causeNoImpPublicEvent || 0, causeNoImpProtest: initialData?.causeNoImpProtest || 0, causeNoImpPublicWork: initialData?.causeNoImpPublicWork || 0, causeNoImpThirdPartyCrash: initialData?.causeNoImpThirdPartyCrash || 0,
+                
+                // Quejas
                 route: initialData?.route || '', 
                 issue: initialData?.issue || 'Retraso', 
                 detail: initialData?.detail || '', 
@@ -578,7 +609,7 @@
             
             return (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[95vh]">
                         <div className="bg-slate-900 p-4 flex justify-between text-white"><h2 className="font-bold flex gap-2"><Icons.Plus/> {initialData ? 'Editar Registro' : 'Nuevo Registro'}</h2><button onClick={close}><Icons.X/></button></div>
                         <div className="flex border-b">
                             <button onClick={()=>!initialData && setTab('incident')} className={`flex-1 py-3 font-bold ${tab==='incident'?'text-rose-600 border-b-2 border-rose-600':'text-slate-500'} ${initialData && 'cursor-not-allowed opacity-50'}`}>Reporte</button>
@@ -598,19 +629,40 @@
                                         <div><label className="text-xs font-bold text-slate-500">Inicios Tarde</label><input type="number" name="lateStarts" value={formData.lateStarts} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
                                         <div><label className="text-xs font-bold text-slate-500">Percances</label><input type="number" name="accidents" value={formData.accidents} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4 mt-2">
-                                        <div className="border-rose-100 border p-2 bg-rose-50/50 rounded"><h4 className="text-xs font-bold text-rose-600 mb-2">Imputables</h4><div className="space-y-2">
-                                            <div className="flex justify-between items-center"><label className="text-xs">Op. Dormido</label><input type="number" name="causeImpSleep" value={formData.causeImpSleep} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                            <div className="flex justify-between items-center"><label className="text-xs">Siniestro</label><input type="number" name="causeImpAccident" value={formData.causeImpAccident} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                            <div className="flex justify-between items-center"><label className="text-xs">Desvío Ruta</label><input type="number" name="causeImpRoute" value={formData.causeImpRoute} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                            <div className="flex justify-between items-center"><label className="text-xs">Falla Mec.</label><input type="number" name="causeImpMech" value={formData.causeImpMech} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                        </div></div>
-                                        <div className="border-slate-200 border p-2 bg-slate-50 rounded"><h4 className="text-xs font-bold text-slate-500 mb-2">No Imputables</h4><div className="space-y-2">
-                                            <div className="flex justify-between items-center"><label className="text-xs">Tráfico</label><input type="number" name="causeNoImpTraffic" value={formData.causeNoImpTraffic} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                            <div className="flex justify-between items-center"><label className="text-xs">Calle Cerrada</label><input type="number" name="causeNoImpClosed" value={formData.causeNoImpClosed} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                            <div className="flex justify-between items-center"><label className="text-xs">Clima</label><input type="number" name="causeNoImpWeather" value={formData.causeNoImpWeather} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                            <div className="flex justify-between items-center"><label className="text-xs">Otros</label><input type="number" name="causeNoImpOther" value={formData.causeNoImpOther} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                        </div></div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                                        {/* IMPUTABLES */}
+                                        <div className="border-rose-100 border p-3 bg-rose-50/50 rounded"><h4 className="text-sm font-bold text-rose-600 mb-3 border-b border-rose-200 pb-1">Imputables</h4>
+                                            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                                                <div className="flex justify-between items-center"><label className="text-xs">Op. Dormido</label><input type="number" name="causeImpSleep" value={formData.causeImpSleep} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Siniestro</label><input type="number" name="causeImpAccident" value={formData.causeImpAccident} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Desvío Ruta</label><input type="number" name="causeImpRoute" value={formData.causeImpRoute} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Falla Mec.</label><input type="number" name="causeImpMech" value={formData.causeImpMech} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Supervisor</label><input type="number" name="causeImpSupervisor" value={formData.causeImpSupervisor} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Actitud de Op</label><input type="number" name="causeImpAttitude" value={formData.causeImpAttitude} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Mal Manejo</label><input type="number" name="causeImpDriving" value={formData.causeImpDriving} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Ponchadura</label><input type="number" name="causeImpFlatTire" value={formData.causeImpFlatTire} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Alcoholemia</label><input type="number" name="causeImpAlcohol" value={formData.causeImpAlcohol} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Diesel</label><input type="number" name="causeImpDiesel" value={formData.causeImpDiesel} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Tema de Op.</label><input type="number" name="causeImpOpTheme" value={formData.causeImpOpTheme} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                            </div>
+                                        </div>
+                                        {/* NO IMPUTABLES */}
+                                        <div className="border-slate-200 border p-3 bg-slate-50 rounded"><h4 className="text-sm font-bold text-slate-500 mb-3 border-b border-slate-200 pb-1">No Imputables</h4>
+                                            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                                                <div className="flex justify-between items-center"><label className="text-xs">Tráfico</label><input type="number" name="causeNoImpTraffic" value={formData.causeNoImpTraffic} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Calle Cerrada</label><input type="number" name="causeNoImpClosed" value={formData.causeNoImpClosed} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Clima</label><input type="number" name="causeNoImpWeather" value={formData.causeNoImpWeather} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Percance S/R</label><input type="number" name="causeNoImpCrashNoResp" value={formData.causeNoImpCrashNoResp} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Tren</label><input type="number" name="causeNoImpTrain" value={formData.causeNoImpTrain} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Vandalismo</label><input type="number" name="causeNoImpVandalism" value={formData.causeNoImpVandalism} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Sobreaforo</label><input type="number" name="causeNoImpOvercapacity" value={formData.causeNoImpOvercapacity} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Evento Publico</label><input type="number" name="causeNoImpPublicEvent" value={formData.causeNoImpPublicEvent} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Manifestación</label><input type="number" name="causeNoImpProtest" value={formData.causeNoImpProtest} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Obra Publica</label><input type="number" name="causeNoImpPublicWork" value={formData.causeNoImpPublicWork} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Acc. Terceros</label><input type="number" name="causeNoImpThirdPartyCrash" value={formData.causeNoImpThirdPartyCrash} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                                <div className="flex justify-between items-center"><label className="text-xs">Otros</label><input type="number" name="causeNoImpOther" value={formData.causeNoImpOther} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </>
                             ) : (
