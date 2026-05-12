@@ -80,16 +80,17 @@
 
         // --- DATOS DEMO ---
         const DEMO_INCIDENTS = [
-            { date: '18/11/25', plant: 'Camiones', shift: 'T1', imp: 1, noImp: 0, lateStarts: 3, serviceLevel: 94.0, safetyScore: 92, onTimeStarts: 90, accidents: 1, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0 }, 
-            { date: '25/11/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 2, lateStarts: 1, serviceLevel: 97.5, safetyScore: 98, onTimeStarts: 98, accidents: 0, causeNoImpTraffic: 2 }, 
+            { date: '18/11/25', plant: 'Camiones', shift: 'T1', imp: 1, noImp: 0, lateStarts: 3, lateStartsNoAff: 1, serviceLevel: 94.0, safetyScore: 92, onTimeStarts: 90, accidents: 1, causeImpSleep: 1, causeImpAccident: 0, causeImpRoute: 0, causeImpMech: 0 }, 
+            { date: '25/11/25', plant: 'Camiones', shift: 'T1', imp: 0, noImp: 2, lateStarts: 1, lateStartsNoAff: 0, serviceLevel: 97.5, safetyScore: 98, onTimeStarts: 98, accidents: 0, causeNoImpTraffic: 2 }, 
         ];
+
         const DEMO_COMPLAINTS = [
             { date: '01/12/25', plant: 'Camiones', route: 'Ruta 1', issue: 'Retraso', detail: 'Llegó 15 mins tarde a la parada', action: 'Acta Admin', source: 'Laborales', type: 'Servicio' },
         ];
 
         const PLANTS = ['Todas', 'Camiones', 'Extensión', 'Van', 'Norte', 'Sur'];
         const { weeksDef: WEEKS_DEF } = (() => {
-            const dates = []; const weeks = {}; let currentDate = new Date(2025, 10, 16);
+            const weeks = {}; let currentDate = new Date(2025, 10, 17); // Lunes 17 Nov 2025
             let weekCounter = 47; let yearForWeek = 2025; let dayCount = 0; let currentWeekKey = '';
             while (currentDate <= new Date(2026, 11, 31)) {
                 const dateStr = `${currentDate.getDate().toString().padStart(2,'0')}/${(currentDate.getMonth()+1).toString().padStart(2,'0')}/${currentDate.getFullYear().toString().slice(-2)}`;
@@ -101,6 +102,32 @@
                 weeks[currentWeekKey].dates.push(dateStr); dayCount++; currentDate.setDate(currentDate.getDate() + 1);
             }
             return { weeksDef: weeks };
+        })();
+
+        // --- DEFINICIÓN DE MESES ---
+        const MONTHS_DEF = (() => {
+            const months = {};
+            const end = new Date(2026, 11, 31);
+            let cur = new Date(2025, 10, 1);
+            const monthNames = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+            while (cur <= end) {
+                const key = `M${(cur.getMonth()+1).toString().padStart(2,'0')}-${cur.getFullYear().toString().slice(-2)}`;
+                const label = `${monthNames[cur.getMonth()]} '${cur.getFullYear().toString().slice(-2)}`;
+                const dates = [];
+                const daysInMonth = new Date(cur.getFullYear(), cur.getMonth()+1, 0).getDate();
+                for (let d = 1; d <= daysInMonth; d++) {
+                    dates.push(`${d.toString().padStart(2,'0')}/${(cur.getMonth()+1).toString().padStart(2,'0')}/${cur.getFullYear().toString().slice(-2)}`);
+                }
+                const weekKeys = Object.keys(WEEKS_DEF).filter(wk => {
+                    const firstDate = WEEKS_DEF[wk].dates[0];
+                    if (!firstDate) return false;
+                    const [dd, mm, yy] = firstDate.split('/');
+                    return parseInt(mm) === cur.getMonth()+1 && parseInt('20'+yy) === cur.getFullYear();
+                });
+                months[key] = { id: key, label, dates, weekKeys };
+                cur = new Date(cur.getFullYear(), cur.getMonth()+1, 1);
+            }
+            return months;
         })();
 
         // --- CHART COMPONENTS ---
@@ -182,6 +209,8 @@
             const [isLoading, setIsLoading] = useState(true);
             const [selectedWeek, setSelectedWeek] = useState('S50-25');
             const [selectedPlant, setSelectedPlant] = useState('Todas');
+            const [viewMode, setViewMode] = useState('weekly'); // 'weekly' | 'monthly'
+            const [selectedMonth, setSelectedMonth] = useState(Object.keys(MONTHS_DEF)[0] || '');
             
             // Estado para MODALES y EDICIÓN
             const [isModalOpen, setIsModalOpen] = useState(false);
@@ -218,20 +247,20 @@
                 const fCom = complaints.filter(c => w.dates.includes(c.date) && (selectedPlant === 'Todas' || c.plant === selectedPlant));
                 
                 const aggs = fInc.reduce((acc, c) => ({
-                    imp: acc.imp + (c.imp || 0), noImp: acc.noImp + (c.noImp || 0), lateStarts: acc.lateStarts + (c.lateStarts || 0), accidents: acc.accidents + (c.accidents || 0), slSum: acc.slSum + (c.serviceLevel || 0),
+                    imp: acc.imp + (c.imp || 0), noImp: acc.noImp + (c.noImp || 0), lateStarts: acc.lateStarts + (c.lateStarts || 0), lateStartsNoAff: acc.lateStartsNoAff + (c.lateStartsNoAff || 0), accidents: acc.accidents + (c.accidents || 0), slSum: acc.slSum + (c.serviceLevel || 0),
                     onTimeSum: acc.onTimeSum + (c.onTimeStarts || 0), safetySum: acc.safetySum + (c.safetyScore || 0),
                     c_imp_sleep: acc.c_imp_sleep + (c.causeImpSleep || 0), c_imp_acc: acc.c_imp_acc + (c.causeImpAccident || 0), c_imp_route: acc.c_imp_route + (c.causeImpRoute || 0), c_imp_mech: acc.c_imp_mech + (c.causeImpMech || 0),
                     c_imp_sup: acc.c_imp_sup + (c.causeImpSupervisor || 0), c_imp_att: acc.c_imp_att + (c.causeImpAttitude || 0), c_imp_driv: acc.c_imp_driv + (c.causeImpDriving || 0), c_imp_flat: acc.c_imp_flat + (c.causeImpFlatTire || 0), c_imp_alc: acc.c_imp_alc + (c.causeImpAlcohol || 0), c_imp_diesel: acc.c_imp_diesel + (c.causeImpDiesel || 0), c_imp_opth: acc.c_imp_opth + (c.causeImpOpTheme || 0),
                     
                     c_noimp_traf: acc.c_noimp_traf + (c.causeNoImpTraffic || 0), c_noimp_weath: acc.c_noimp_weath + (c.causeNoImpWeather || 0), c_noimp_closed: acc.c_noimp_closed + (c.causeNoImpClosed || 0), c_noimp_other: acc.c_noimp_other + (c.causeNoImpOther || 0),
                     c_noimp_sr: acc.c_noimp_sr + (c.causeNoImpCrashNoResp || 0), c_noimp_train: acc.c_noimp_train + (c.causeNoImpTrain || 0), c_noimp_vand: acc.c_noimp_vand + (c.causeNoImpVandalism || 0), c_noimp_over: acc.c_noimp_over + (c.causeNoImpOvercapacity || 0), c_noimp_event: acc.c_noimp_event + (c.causeNoImpPublicEvent || 0), c_noimp_prot: acc.c_noimp_prot + (c.causeNoImpProtest || 0), c_noimp_work: acc.c_noimp_work + (c.causeNoImpPublicWork || 0), c_noimp_3rd: acc.c_noimp_3rd + (c.causeNoImpThirdPartyCrash || 0)
-                }), { imp:0, noImp:0, lateStarts:0, accidents:0, slSum:0, onTimeSum:0, safetySum:0, 
+                }), { imp:0, noImp:0, lateStarts:0, lateStartsNoAff:0, accidents:0, slSum:0, onTimeSum:0, safetySum:0, 
                     c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_imp_sup:0, c_imp_att:0, c_imp_driv:0, c_imp_flat:0, c_imp_alc:0, c_imp_diesel:0, c_imp_opth:0, 
                     c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0, c_noimp_sr:0, c_noimp_train:0, c_noimp_vand:0, c_noimp_over:0, c_noimp_event:0, c_noimp_prot:0, c_noimp_work:0, c_noimp_3rd:0 
                 });
 
                 return {
-                    weekLabel: w.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, accidents: aggs.accidents, 
+                    weekLabel: w.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, lateStartsNoAff: aggs.lateStartsNoAff, lateStartsAff: aggs.lateStarts, accidents: aggs.accidents, 
                     serviceLevel: fInc.length > 0 ? parseFloat((aggs.slSum / fInc.length).toFixed(1)) : 100,
                     safetyScore: fInc.length > 0 ? parseFloat((aggs.safetySum / fInc.length).toFixed(1)) : 100,
                     onTimeStarts: fInc.length > 0 ? parseFloat((aggs.onTimeSum / fInc.length).toFixed(1)) : 100, 
@@ -239,13 +268,80 @@
                 };
             };
 
+            const calculateMonthStats = (monthKey) => {
+                const mo = MONTHS_DEF[monthKey]; if (!mo) return null;
+                const fInc = incidents.filter(i => mo.dates.includes(i.date) && (selectedPlant === 'Todas' || i.plant === selectedPlant));
+                const fCom = complaints.filter(c => mo.dates.includes(c.date) && (selectedPlant === 'Todas' || c.plant === selectedPlant));
+                const aggs = fInc.reduce((acc, c) => ({
+                    imp: acc.imp + (c.imp || 0), noImp: acc.noImp + (c.noImp || 0), lateStarts: acc.lateStarts + (c.lateStarts || 0), lateStartsNoAff: acc.lateStartsNoAff + (c.lateStartsNoAff || 0), accidents: acc.accidents + (c.accidents || 0), slSum: acc.slSum + (c.serviceLevel || 0),
+                    onTimeSum: acc.onTimeSum + (c.onTimeStarts || 0), safetySum: acc.safetySum + (c.safetyScore || 0),
+                    c_imp_sleep: acc.c_imp_sleep + (c.causeImpSleep || 0), c_imp_acc: acc.c_imp_acc + (c.causeImpAccident || 0), c_imp_route: acc.c_imp_route + (c.causeImpRoute || 0), c_imp_mech: acc.c_imp_mech + (c.causeImpMech || 0),
+                    c_imp_sup: acc.c_imp_sup + (c.causeImpSupervisor || 0), c_imp_att: acc.c_imp_att + (c.causeImpAttitude || 0), c_imp_driv: acc.c_imp_driv + (c.causeImpDriving || 0), c_imp_flat: acc.c_imp_flat + (c.causeImpFlatTire || 0), c_imp_alc: acc.c_imp_alc + (c.causeImpAlcohol || 0), c_imp_diesel: acc.c_imp_diesel + (c.causeImpDiesel || 0), c_imp_opth: acc.c_imp_opth + (c.causeImpOpTheme || 0),
+                    c_noimp_traf: acc.c_noimp_traf + (c.causeNoImpTraffic || 0), c_noimp_weath: acc.c_noimp_weath + (c.causeNoImpWeather || 0), c_noimp_closed: acc.c_noimp_closed + (c.causeNoImpClosed || 0), c_noimp_other: acc.c_noimp_other + (c.causeNoImpOther || 0),
+                    c_noimp_sr: acc.c_noimp_sr + (c.causeNoImpCrashNoResp || 0), c_noimp_train: acc.c_noimp_train + (c.causeNoImpTrain || 0), c_noimp_vand: acc.c_noimp_vand + (c.causeNoImpVandalism || 0), c_noimp_over: acc.c_noimp_over + (c.causeNoImpOvercapacity || 0), c_noimp_event: acc.c_noimp_event + (c.causeNoImpPublicEvent || 0), c_noimp_prot: acc.c_noimp_prot + (c.causeNoImpProtest || 0), c_noimp_work: acc.c_noimp_work + (c.causeNoImpPublicWork || 0), c_noimp_3rd: acc.c_noimp_3rd + (c.causeNoImpThirdPartyCrash || 0)
+                }), { imp:0, noImp:0, lateStarts:0, lateStartsNoAff:0, accidents:0, slSum:0, onTimeSum:0, safetySum:0,
+                    c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_imp_sup:0, c_imp_att:0, c_imp_driv:0, c_imp_flat:0, c_imp_alc:0, c_imp_diesel:0, c_imp_opth:0,
+                    c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0, c_noimp_sr:0, c_noimp_train:0, c_noimp_vand:0, c_noimp_over:0, c_noimp_event:0, c_noimp_prot:0, c_noimp_work:0, c_noimp_3rd:0
+                });
+                return {
+                    monthLabel: mo.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, lateStartsNoAff: aggs.lateStartsNoAff, lateStartsAff: aggs.lateStarts, accidents: aggs.accidents,
+                    serviceLevel: fInc.length > 0 ? parseFloat((aggs.slSum / fInc.length).toFixed(1)) : 100,
+                    safetyScore: fInc.length > 0 ? parseFloat((aggs.safetySum / fInc.length).toFixed(1)) : 100,
+                    onTimeStarts: fInc.length > 0 ? parseFloat((aggs.onTimeSum / fInc.length).toFixed(1)) : 100,
+                    totalComplaints: fCom.length, incidents: fInc, complaints: fCom, dates: mo.dates, weekKeys: mo.weekKeys, aggs,
+                    causes: {
+                        imp: [
+                            { label: 'Op. Dormido', val: aggs.c_imp_sleep || 0, color: '#f43f5e' }, { label: 'Siniestro', val: aggs.c_imp_acc || 0, color: '#fb7185' }, { label: 'Desvío Ruta', val: aggs.c_imp_route || 0, color: '#fda4af' }, { label: 'Falla Mec.', val: aggs.c_imp_mech || 0, color: '#be123c' },
+                            { label: 'Supervisor', val: aggs.c_imp_sup || 0, color: '#e11d48' }, { label: 'Actitud de Op', val: aggs.c_imp_att || 0, color: '#9f1239' }, { label: 'Mal Manejo', val: aggs.c_imp_driv || 0, color: '#fecdd3' }, { label: 'Ponchadura', val: aggs.c_imp_flat || 0, color: '#881337' },
+                            { label: 'Alcoholemia', val: aggs.c_imp_alc || 0, color: '#ef4444' }, { label: 'Diesel', val: aggs.c_imp_diesel || 0, color: '#dc2626' }, { label: 'Tema de Op.', val: aggs.c_imp_opth || 0, color: '#b91c1c' }
+                        ],
+                        noImp: [
+                            { label: 'Tráfico', val: aggs.c_noimp_traf || 0, color: '#64748b' }, { label: 'Calle Cerrada', val: aggs.c_noimp_closed || 0, color: '#475569' }, { label: 'Clima', val: aggs.c_noimp_weath || 0, color: '#94a3b8' }, { label: 'Otros', val: aggs.c_noimp_other || 0, color: '#cbd5e1' },
+                            { label: 'Percance S/R', val: aggs.c_noimp_sr || 0, color: '#334155' }, { label: 'Tren', val: aggs.c_noimp_train || 0, color: '#e2e8f0' }, { label: 'Vandalismo', val: aggs.c_noimp_vand || 0, color: '#1e293b' }, { label: 'Sobreaforo', val: aggs.c_noimp_over || 0, color: '#f1f5f9' },
+                            { label: 'Evento Publico', val: aggs.c_noimp_event || 0, color: '#0f172a' }, { label: 'Manifestación', val: aggs.c_noimp_prot || 0, color: '#9ca3af' }, { label: 'Obra Publica', val: aggs.c_noimp_work || 0, color: '#d1d5db' }, { label: 'Accidente Terceros', val: aggs.c_noimp_3rd || 0, color: '#4b5563' }
+                        ]
+                    }
+                };
+            };
+
             const dashboardData = useMemo(() => {
+                if (viewMode === 'monthly') {
+                    const current = calculateMonthStats(selectedMonth);
+                    const monthKeys = Object.keys(MONTHS_DEF);
+                    const idx = monthKeys.indexOf(selectedMonth);
+                    const prev = idx > 0 ? calculateMonthStats(monthKeys[idx - 1]) : null;
+                    // Tendencias: últimos 4 meses
+                    const trends = monthKeys.slice(Math.max(0, idx - 3), idx + 1).map(k => {
+                        const s = calculateMonthStats(k);
+                        return { label: s ? s.monthLabel : k, serviceLevel: s ? s.serviceLevel : 0, lateStarts: s ? s.lateStartsAff : 0, lateStartsNoAff: s ? s.lateStartsNoAff : 0, imp: s ? s.totalImp : 0, accidents: s ? s.accidents : 0, complaints: s ? s.totalComplaints : 0, safetyScore: s ? s.safetyScore : 0, onTimeStarts: s ? s.onTimeStarts : 0 };
+                    });
+                    // Barras por semana del mes seleccionado
+                    const weeklyStats = current ? (current.weekKeys || []).map(wk => {
+                        const ws = calculateWeekStats(wk);
+                        return {
+                            date: WEEKS_DEF[wk] ? WEEKS_DEF[wk].dates[0] : wk,
+                            dayName: WEEKS_DEF[wk] ? WEEKS_DEF[wk].label : wk,
+                            imp: ws ? ws.totalImp : 0, noImp: ws ? ws.totalNoImp : 0,
+                            lateStarts: ws ? ws.lateStartsAff : 0, lateStartsNoAff: ws ? ws.lateStartsNoAff : 0,
+                            accidents: ws ? ws.accidents : 0,
+                            serviceLevel: ws ? ws.serviceLevel : 100, safetyScore: ws ? ws.safetyScore : 100, onTimeStarts: ws ? ws.onTimeStarts : 100
+                        };
+                    }) : [];
+                    const complaintReasons = current && current.complaints.length > 0 ? Object.entries(current.complaints.reduce((acc, c) => { acc[c.issue] = (acc[c.issue] || 0) + 1; return acc; }, {})).map(([label, val], i) => ({ label, val, color: ['#a855f7', '#c084fc', '#d8b4fe', '#f3e8ff', '#7e22ce'][i % 5] })) : [];
+                    return {
+                        current: current || {}, prev: prev || {}, trends, dailyStats: weeklyStats, complaintReasons,
+                        causes: current ? current.causes : { imp: [], noImp: [] },
+                        isMonthly: true
+                    };
+                }
+
+                // --- MODO SEMANAL (original) ---
                 const current = calculateWeekStats(selectedWeek);
                 const keys = Object.keys(WEEKS_DEF); const idx = keys.indexOf(selectedWeek);
                 const prev = idx > 0 ? calculateWeekStats(keys[idx - 1]) : null;
                 const trends = keys.slice(Math.max(0, idx - 3), idx + 1).map(k => {
                     const s = calculateWeekStats(k);
-                    return { label: s ? s.weekLabel : k, serviceLevel: s ? s.serviceLevel : 0, lateStarts: s ? s.lateStarts : 0, imp: s ? s.totalImp : 0, accidents: s ? s.accidents : 0, complaints: s ? s.totalComplaints : 0, safetyScore: s ? s.safetyScore : 0, onTimeStarts: s ? s.onTimeStarts : 0 };
+                    return { label: s ? s.weekLabel : k, serviceLevel: s ? s.serviceLevel : 0, lateStarts: s ? s.lateStartsAff : 0, lateStartsNoAff: s ? s.lateStartsNoAff : 0, imp: s ? s.totalImp : 0, accidents: s ? s.accidents : 0, complaints: s ? s.totalComplaints : 0, safetyScore: s ? s.safetyScore : 0, onTimeStarts: s ? s.onTimeStarts : 0 };
                 });
 
                 const dailyStats = current ? current.dates.map(d => {
@@ -253,7 +349,10 @@
                     const dt = new Date(d.split('/').reverse().join('-'));
                     return { 
                         date: d, dayName: isNaN(dt) ? '-' : dt.toLocaleDateString('es-ES', { weekday: 'short' }).toUpperCase().replace('.',''),
-                        imp: dayInc.reduce((s, i) => s + (i.imp || 0), 0), noImp: dayInc.reduce((s, i) => s + (i.noImp || 0), 0), lateStarts: dayInc.reduce((s, i) => s + (i.lateStarts || 0), 0), accidents: dayInc.reduce((s, i) => s + (i.accidents || 0), 0),
+                        imp: dayInc.reduce((s, i) => s + (i.imp || 0), 0), noImp: dayInc.reduce((s, i) => s + (i.noImp || 0), 0),
+                        lateStarts: dayInc.reduce((s, i) => s + (i.lateStarts || 0), 0),
+                        lateStartsNoAff: dayInc.reduce((s, i) => s + (i.lateStartsNoAff || 0), 0),
+                        accidents: dayInc.reduce((s, i) => s + (i.accidents || 0), 0),
                         serviceLevel: dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + i.serviceLevel, 0) / dayInc.length).toFixed(1)) : 100,
                         safetyScore: dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + (i.safetyScore || 100), 0) / dayInc.length).toFixed(1)) : 100,
                         onTimeStarts: dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + (i.onTimeStarts !== undefined ? i.onTimeStarts : 100), 0) / dayInc.length).toFixed(1)) : 100
@@ -292,9 +391,10 @@
                             { label: 'Obra Publica', val: current?.aggs.c_noimp_work || 0, color: '#d1d5db' },
                             { label: 'Accidente Terceros', val: current?.aggs.c_noimp_3rd || 0, color: '#4b5563' }
                         ]
-                    }
+                    },
+                    isMonthly: false
                 };
-            }, [incidents, complaints, selectedWeek, selectedPlant]);
+            }, [incidents, complaints, selectedWeek, selectedPlant, viewMode, selectedMonth]);
 
             const handleDelete = async (coll, id) => { if(confirm("¿Eliminar registro permanentemente?")) { await db.collection(coll).doc(id).delete(); showNotification('success', 'Eliminado'); }};
 
@@ -315,8 +415,17 @@
                     <header className="bg-slate-900 text-white shadow-lg sticky top-0 z-30">
                         <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
                             <div className="flex items-center gap-3"><div className="p-2 bg-rose-600 rounded-lg"><Icons.Truck /></div><div><h1 className="text-xl font-bold flex items-center gap-2">Control Transporte {isLoading && <span className="loader"></span>}</h1><p className="text-xs text-slate-400">Dashboard Interactivo</p></div></div>
-                            <div className="flex gap-3 items-center">
-                                <select className="bg-slate-800 border border-slate-700 rounded px-3 py-1 text-sm" value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)}>{Object.values(WEEKS_DEF).map(w => <option key={w.id} value={w.id}>{w.fullLabel}</option>)}</select>
+                            <div className="flex gap-3 items-center flex-wrap justify-center">
+                                {/* Toggle Semanal / Mensual */}
+                                <div className="flex bg-slate-800 border border-slate-700 rounded overflow-hidden text-sm">
+                                    <button onClick={() => setViewMode('weekly')} className={`px-3 py-1 ${viewMode==='weekly' ? 'bg-rose-600 text-white' : 'text-slate-300 hover:bg-slate-700'}`}>Semanal</button>
+                                    <button onClick={() => setViewMode('monthly')} className={`px-3 py-1 ${viewMode==='monthly' ? 'bg-rose-600 text-white' : 'text-slate-300 hover:bg-slate-700'}`}>Mensual</button>
+                                </div>
+                                {viewMode === 'weekly' ? (
+                                    <select className="bg-slate-800 border border-slate-700 rounded px-3 py-1 text-sm" value={selectedWeek} onChange={(e) => setSelectedWeek(e.target.value)}>{Object.values(WEEKS_DEF).map(w => <option key={w.id} value={w.id}>{w.fullLabel}</option>)}</select>
+                                ) : (
+                                    <select className="bg-slate-800 border border-slate-700 rounded px-3 py-1 text-sm" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>{Object.values(MONTHS_DEF).map(m => <option key={m.id} value={m.id}>{m.label}</option>)}</select>
+                                )}
                                 <select className="bg-slate-800 border border-slate-700 rounded px-3 py-1 text-sm" value={selectedPlant} onChange={(e) => setSelectedPlant(e.target.value)}>{PLANTS.map(p => <option key={p} value={p}>{p}</option>)}</select>
                                 
                                 {isAdmin ? (
@@ -353,7 +462,7 @@
                             <KpiCard title="Nivel Servicio" value={dashboardData.current.serviceLevel} prevValue={dashboardData.prev.serviceLevel} icon={Icons.Activity} colorClass="bg-emerald-500 text-emerald-600" higherIsBetter={true} suffix="%" />
                             <KpiCard title="Score Seguridad" value={dashboardData.current.safetyScore} prevValue={dashboardData.prev.safetyScore} icon={Icons.Shield} colorClass="bg-blue-500 text-blue-600" higherIsBetter={true} suffix="%" />
                             <KpiCard title="Inicios a Tiempo" value={dashboardData.current.onTimeStarts} prevValue={dashboardData.prev.onTimeStarts} icon={Icons.CheckCircle} colorClass="bg-cyan-500 text-cyan-600" higherIsBetter={true} suffix="%" />
-                            <KpiCard title="Inicios Tarde" value={dashboardData.current.lateStarts} prevValue={dashboardData.prev.lateStarts} icon={Icons.Clock} colorClass="bg-amber-500 text-amber-600" />
+                            <KpiCard title="Inicios Tarde c/Afect." value={dashboardData.current.lateStartsAff || 0} prevValue={dashboardData.prev.lateStartsAff !== undefined ? dashboardData.prev.lateStartsAff : null} icon={Icons.Clock} colorClass="bg-amber-500 text-amber-600" />
                             
                             <KpiCard title="Fallas Imputables" value={dashboardData.current.totalImp || 0} prevValue={dashboardData.prev.totalImp} icon={Icons.BarChart2} colorClass="bg-rose-500 text-rose-600" />
                             <KpiCard title="Percances" value={dashboardData.current.accidents} prevValue={dashboardData.prev.accidents} icon={Icons.AlertOctagon} colorClass="bg-orange-500 text-orange-600" />
@@ -363,11 +472,11 @@
                         {/* GRÁFICAS PRINCIPALES */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                                <h3 className="font-bold mb-6 flex gap-2 items-center"><span className="text-slate-500"><Icons.BarChart2 /></span> Fallas Semanales</h3>
+                                <h3 className="font-bold mb-6 flex gap-2 items-center"><span className="text-slate-500"><Icons.BarChart2 /></span> Fallas {viewMode === 'monthly' ? '(Por Semana del Mes)' : 'Semanales'}</h3>
                                 <SimpleBarChart data={dashboardData.dailyStats} dataKeys={['noImp', 'imp']} colors={['bg-slate-400', 'bg-rose-500']} height={200} />
                             </div>
                             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                                <h3 className="font-bold mb-4 flex gap-2 items-center"><span className="text-slate-500"><Icons.PieChart /></span> Causas (Semanal)</h3>
+                                <h3 className="font-bold mb-4 flex gap-2 items-center"><span className="text-slate-500"><Icons.PieChart /></span> Causas ({viewMode === 'monthly' ? 'Mensual' : 'Semanal'})</h3>
                                 <div className="grid grid-cols-2 gap-2">
                                     <SimpleDonutChart title="Imputables" total={dashboardData.current.totalImp || 0} data={dashboardData.causes.imp} />
                                     <SimpleDonutChart title="No Imp" total={dashboardData.current.totalNoImp || 0} data={dashboardData.causes.noImp} />
@@ -379,7 +488,7 @@
                         <div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div className="bg-white p-4 rounded-xl border shadow-sm">
-                                    <h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-emerald-500"><Icons.Activity /></span> Nivel Servicio (Diario)</h3>
+                                    <h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-emerald-500"><Icons.Activity /></span> Nivel Servicio ({viewMode === 'monthly' ? 'Por Semana' : 'Diario'})</h3>
                                     <div className="w-full flex items-end justify-between gap-2 h-[150px]">
                                         {dashboardData.dailyStats.map((item, idx) => (
                                             <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
@@ -393,7 +502,7 @@
                                     </div>
                                 </div>
                                 <div className="bg-white p-4 rounded-xl border shadow-sm">
-                                    <h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-blue-500"><Icons.Shield /></span> Score Seguridad (Diario)</h3>
+                                    <h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-blue-500"><Icons.Shield /></span> Score Seguridad ({viewMode === 'monthly' ? 'Por Semana' : 'Diario'})</h3>
                                     <div className="w-full flex items-end justify-between gap-2 h-[150px]">
                                         {dashboardData.dailyStats.map((item, idx) => (
                                             <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
@@ -408,7 +517,14 @@
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                                <div className="bg-white p-4 rounded-xl border shadow-sm"><h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-amber-500"><Icons.Clock /></span> Inicios Tarde</h3><SimpleBarChart data={dashboardData.dailyStats} dataKeys={['lateStarts']} colors={['bg-amber-400']} height={150} /></div>
+                                <div className="bg-white p-4 rounded-xl border shadow-sm">
+                                    <h3 className="font-bold mb-2 flex gap-2 items-center text-sm"><span className="text-amber-500"><Icons.Clock /></span> Inicios Tarde</h3>
+                                    <div className="flex gap-4 text-xs mb-3 justify-center">
+                                        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-amber-400 inline-block"></span> Con Afect.</span>
+                                        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-amber-200 inline-block"></span> Sin Afect.</span>
+                                    </div>
+                                    <SimpleBarChart data={dashboardData.dailyStats} dataKeys={['lateStarts', 'lateStartsNoAff']} colors={['bg-amber-400', 'bg-amber-200']} height={150} />
+                                </div>
                                 <div className="bg-white p-4 rounded-xl border shadow-sm"><h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-orange-500"><Icons.AlertOctagon /></span> Percances</h3><SimpleBarChart data={dashboardData.dailyStats} dataKeys={['accidents']} colors={['bg-orange-400']} height={150} /></div>
                                 <div className="bg-white p-4 rounded-xl border shadow-sm"><h3 className="font-bold mb-4 flex gap-2 items-center text-sm"><span className="text-cyan-500"><Icons.CheckCircle /></span> Inicios a Tiempo</h3><SimpleBarChart data={dashboardData.dailyStats} dataKeys={['onTimeStarts']} colors={['bg-cyan-400']} height={150} /></div>
                             </div>
@@ -416,7 +532,7 @@
 
                         {/* TENDENCIAS */}
                         <div>
-                            <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2"><span className="bg-slate-200 p-1 rounded"><Icons.BarChart2 /></span> Tendencias (Últimas 4 Semanas)</h3>
+                            <h3 className="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2"><span className="bg-slate-200 p-1 rounded"><Icons.BarChart2 /></span> Tendencias ({viewMode === 'monthly' ? 'Últimos 4 Meses' : 'Últimas 4 Semanas'})</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                 <TrendChart title="Nivel Servicio" data={dashboardData.trends} dataKey="serviceLevel" color="#10b981" suffix="%" />
                                 <TrendChart title="Score Seguridad" data={dashboardData.trends} dataKey="safetyScore" color="#3b82f6" suffix="%" />
@@ -473,7 +589,8 @@
                                                     <th className="p-3 text-center">N.S.</th>
                                                     <th className="p-3 text-center bg-blue-50 text-blue-600">Seg%</th>
                                                     <th className="p-3 text-center bg-cyan-50 text-cyan-600">A Tiempo%</th>
-                                                    <th className="p-3 text-center bg-amber-50 text-amber-600">I.T.</th>
+                                                    <th className="p-3 text-center bg-amber-50 text-amber-600">I.T. c/Af.</th>
+                                                    <th className="p-3 text-center bg-amber-50 text-amber-400">I.T. s/Af.</th>
                                                     <th className="p-3 text-center bg-orange-50 text-orange-600">Perc.</th>
                                                     {isAdmin && <th className="p-3"></th>}
                                                 </tr>
@@ -488,6 +605,7 @@
                                                         <td className="p-3 text-center font-bold text-blue-600 bg-blue-50/30">{inc.safetyScore || 100}%</td>
                                                         <td className="p-3 text-center font-bold text-cyan-600 bg-cyan-50/30">{inc.onTimeStarts !== undefined ? inc.onTimeStarts : 100}%</td>
                                                         <td className="p-3 text-center font-bold text-amber-600 bg-amber-50/30">{inc.lateStarts || 0}</td>
+                                                        <td className="p-3 text-center font-bold text-amber-400 bg-amber-50/20">{inc.lateStartsNoAff || 0}</td>
                                                         <td className="p-3 text-center font-bold text-orange-600 bg-orange-50/30">{inc.accidents || 0}</td>
                                                         {isAdmin && <td className="p-3 text-right min-w-[80px]">
                                                             <button onClick={() => handleEdit(inc, 'incident')} className="text-blue-400 hover:text-blue-600 mr-2" title="Editar"><Icons.Edit /></button>
@@ -520,7 +638,8 @@
                                     ...data, 
                                     date: `${d}/${m}/${y.slice(-2)}`, 
                                     imp, noImp, 
-                                    lateStarts: parseInt(data.lateStarts)||0, 
+                                    lateStarts: parseInt(data.lateStarts)||0,
+                                    lateStartsNoAff: parseInt(data.lateStartsNoAff)||0,
                                     serviceLevel: parseFloat(data.serviceLevel)||100, 
                                     safetyScore: parseFloat(data.safetyScore)||100,
                                     onTimeStarts: parseFloat(data.onTimeStarts)||100,
@@ -586,6 +705,7 @@
                 safetyScore: initialData?.safetyScore !== undefined ? initialData.safetyScore : 100, 
                 onTimeStarts: initialData?.onTimeStarts !== undefined ? initialData.onTimeStarts : 100, 
                 lateStarts: initialData?.lateStarts || 0, 
+                lateStartsNoAff: initialData?.lateStartsNoAff || 0,
                 accidents: initialData?.accidents || 0, 
                 
                 // Imputables
@@ -624,9 +744,10 @@
                                          <div><label className="text-xs font-bold text-blue-600">Score Seguridad %</label><input type="number" step="0.1" name="safetyScore" value={formData.safetyScore} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-blue-600"/></div>
                                          <div><label className="text-xs font-bold text-cyan-600">Inicios a Tiempo %</label><input type="number" step="0.1" name="onTimeStarts" value={formData.onTimeStarts} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-cyan-600"/></div>
                                     </div>
-                                    <div className="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded border">
+                                    <div className="grid grid-cols-4 gap-2 bg-slate-50 p-3 rounded border">
                                         <div><label className="text-xs font-bold text-slate-500">Turno</label><select name="shift" value={formData.shift} onChange={handleChange} className="w-full border rounded p-1 text-sm"><option>T1</option><option>T2</option><option>T3</option></select></div>
-                                        <div><label className="text-xs font-bold text-slate-500">Inicios Tarde</label><input type="number" name="lateStarts" value={formData.lateStarts} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
+                                        <div><label className="text-xs font-bold text-amber-600">I. Tarde c/Afect.</label><input type="number" name="lateStarts" value={formData.lateStarts} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
+                                        <div><label className="text-xs font-bold text-amber-400">I. Tarde s/Afect.</label><input type="number" name="lateStartsNoAff" value={formData.lateStartsNoAff} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
                                         <div><label className="text-xs font-bold text-slate-500">Percances</label><input type="number" name="accidents" value={formData.accidents} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
