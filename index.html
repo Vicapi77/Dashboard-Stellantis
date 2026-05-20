@@ -192,10 +192,19 @@
             );
         };
 
-        const KpiCard = ({ title, value, prevValue, icon: Icon, colorClass, higherIsBetter = false, suffix = '' }) => {
+        const KpiCard = ({ title, value, prevValue, icon: Icon, colorClass, higherIsBetter = false, suffix = '', tooltip = '' }) => {
             const diff = value - prevValue; const isPos = diff > 0; const isGood = higherIsBetter ? isPos : !isPos;
+            const [showTip, setShowTip] = React.useState(false);
             return (
-                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-full">
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-full relative"
+                    onMouseEnter={() => tooltip && setShowTip(true)}
+                    onMouseLeave={() => setShowTip(false)}>
+                    {showTip && (
+                        <div style={{position:'absolute',bottom:'calc(100% + 8px)',left:'50%',transform:'translateX(-50%)',zIndex:50,width:'220px',background:'#1e293b',color:'#f1f5f9',fontSize:'12px',lineHeight:'1.5',padding:'10px 12px',borderRadius:'8px',boxShadow:'0 4px 16px rgba(0,0,0,0.25)',pointerEvents:'none'}}>
+                            {tooltip}
+                            <div style={{position:'absolute',top:'100%',left:'50%',transform:'translateX(-50%)',width:0,height:0,borderLeft:'6px solid transparent',borderRight:'6px solid transparent',borderTop:'6px solid #1e293b'}}></div>
+                        </div>
+                    )}
                     <div><div className="flex justify-between items-start mb-2"><p className="text-slate-500 text-sm font-medium">{title}</p><div className={`p-1.5 rounded-lg ${colorClass} bg-opacity-10 text-opacity-100`}><Icon /></div></div><h3 className="text-2xl font-bold text-slate-800">{value}<span className="text-base text-slate-400 ml-1">{suffix}</span></h3></div>
                     {prevValue !== null ? <div className={`flex items-center gap-1 text-xs font-bold mt-2 ${diff === 0 ? 'text-slate-400' : (isGood ? 'text-emerald-500' : 'text-red-500')}`}>{diff > 0 ? <Icons.ArrowUp /> : diff < 0 ? <Icons.ArrowDown /> : <Icons.Minus />}<span>{Math.abs(diff).toFixed(suffix === '%' ? 1 : 0)}{suffix} vs sem ant</span></div> : <div className="text-xs text-slate-300 mt-2">Sin datos previos</div>}
                 </div>
@@ -459,14 +468,14 @@
                     <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
                         {/* KPIs */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-                            <KpiCard title="Nivel Servicio" value={dashboardData.current.serviceLevel} prevValue={dashboardData.prev.serviceLevel} icon={Icons.Activity} colorClass="bg-emerald-500 text-emerald-600" higherIsBetter={true} suffix="%" />
-                            <KpiCard title="Score Seguridad" value={dashboardData.current.safetyScore} prevValue={dashboardData.prev.safetyScore} icon={Icons.Shield} colorClass="bg-blue-500 text-blue-600" higherIsBetter={true} suffix="%" />
-                            <KpiCard title="Inicios a Tiempo" value={dashboardData.current.onTimeStarts} prevValue={dashboardData.prev.onTimeStarts} icon={Icons.CheckCircle} colorClass="bg-cyan-500 text-cyan-600" higherIsBetter={true} suffix="%" />
-                            <KpiCard title="Inicios Tarde c/Afect." value={dashboardData.current.lateStartsAff || 0} prevValue={dashboardData.prev.lateStartsAff !== undefined ? dashboardData.prev.lateStartsAff : null} icon={Icons.Clock} colorClass="bg-amber-500 text-amber-600" />
+                            <KpiCard title="Nivel Servicio" value={dashboardData.current.serviceLevel} prevValue={dashboardData.prev.serviceLevel} icon={Icons.Activity} colorClass="bg-emerald-500 text-emerald-600" higherIsBetter={true} suffix="%"  tooltip="Porcentaje de viajes que llegan a tiempo respecto al total de viajes ejecutados." />
+                            <KpiCard title="Score Seguridad" value={dashboardData.current.safetyScore} prevValue={dashboardData.prev.safetyScore} icon={Icons.Shield} colorClass="bg-blue-500 text-blue-600" higherIsBetter={true} suffix="%"  tooltip="Evaluación cuantitativa del comportamiento de manejo de los operadores basada en telemetrías." />
+                            <KpiCard title="Inicios a Tiempo" value={dashboardData.current.onTimeStarts} prevValue={dashboardData.prev.onTimeStarts} icon={Icons.CheckCircle} colorClass="bg-cyan-500 text-cyan-600" higherIsBetter={true} suffix="%"  tooltip="Porcentaje de viajes que inician su recorrido dentro de la ventana de tiempo acordada respecto al total de viajes." />
+                            <KpiCard title="Inicios Tarde c/Afect." value={dashboardData.current.lateStartsAff || 0} prevValue={dashboardData.prev.lateStartsAff !== undefined ? dashboardData.prev.lateStartsAff : null} icon={Icons.Clock} colorClass="bg-amber-500 text-amber-600"  tooltip="Número de viajes con retraso en el origen que provocaron un impacto negativo en la ventana de entrega en planta." />
                             
-                            <KpiCard title="Fallas Imputables" value={dashboardData.current.totalImp || 0} prevValue={dashboardData.prev.totalImp} icon={Icons.BarChart2} colorClass="bg-rose-500 text-rose-600" />
-                            <KpiCard title="Percances" value={dashboardData.current.accidents} prevValue={dashboardData.prev.accidents} icon={Icons.AlertOctagon} colorClass="bg-orange-500 text-orange-600" />
-                             <KpiCard title="Quejas" value={dashboardData.current.totalComplaints} prevValue={dashboardData.prev.totalComplaints} icon={Icons.MessageSquare} colorClass="bg-purple-500 text-purple-600" />
+                            <KpiCard title="Fallas Imputables" value={dashboardData.current.totalImp || 0} prevValue={dashboardData.prev.totalImp} icon={Icons.BarChart2} colorClass="bg-rose-500 text-rose-600"  tooltip="Incidentes atribuibles a la operación (ej. fallas mecánicas, retraso del operador) que causan un retraso en la entrega en planta." />
+                            <KpiCard title="Percances" value={dashboardData.current.accidents} prevValue={dashboardData.prev.accidents} icon={Icons.AlertOctagon} colorClass="bg-orange-500 text-orange-600"  tooltip="Número total de accidentes, colisiones o siniestros viales registrados durante la ejecución del servicio." />
+                             <KpiCard title="Quejas" value={dashboardData.current.totalComplaints} prevValue={dashboardData.prev.totalComplaints} icon={Icons.MessageSquare} colorClass="bg-purple-500 text-purple-600"  tooltip="Reportes o inconformidades del cliente por desviaciones en el servicio (ej. limpieza de la unidad, actitud del operador, falta de EPP) que no alteran el tiempo de entrega." />
                         </div>
 
                         {/* GRÁFICAS PRINCIPALES */}
