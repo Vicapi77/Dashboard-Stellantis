@@ -89,6 +89,23 @@
         ];
 
         const PLANTS = ['Todas', 'Camiones', 'Extensión', 'Van', 'Norte', 'Sur'];
+
+        // --- CAMPOS CONTABLES CON DETALLE DE RUTA/MINUTOS POR OCURRENCIA ---
+        const LATE_FIELDS = [
+            { key: 'lateStarts', label: 'I. Tarde c/Afect.' },
+            { key: 'lateStartsNoAff', label: 'I. Tarde s/Afect.' }
+        ];
+        const IMP_FIELDS = [
+            { key: 'causeImpSleep', label: 'Op. Dormido' }, { key: 'causeImpAccident', label: 'Siniestro' }, { key: 'causeImpRoute', label: 'Desvío Ruta' }, { key: 'causeImpMech', label: 'Falla Mec.' },
+            { key: 'causeImpSupervisor', label: 'Supervisor' }, { key: 'causeImpAttitude', label: 'Actitud de Op' }, { key: 'causeImpDriving', label: 'Mal Manejo' }, { key: 'causeImpFlatTire', label: 'Ponchadura' },
+            { key: 'causeImpAlcohol', label: 'Alcoholemia' }, { key: 'causeImpDiesel', label: 'Diesel' }, { key: 'causeImpOpTheme', label: 'Tema de Op.' }
+        ];
+        const NOIMP_FIELDS = [
+            { key: 'causeNoImpTraffic', label: 'Tráfico' }, { key: 'causeNoImpClosed', label: 'Calle Cerrada' }, { key: 'causeNoImpWeather', label: 'Clima' }, { key: 'causeNoImpCrashNoResp', label: 'Percance S/R' },
+            { key: 'causeNoImpTrain', label: 'Tren' }, { key: 'causeNoImpVandalism', label: 'Vandalismo' }, { key: 'causeNoImpOvercapacity', label: 'Sobreaforo' }, { key: 'causeNoImpPublicEvent', label: 'Evento Publico' },
+            { key: 'causeNoImpProtest', label: 'Manifestación' }, { key: 'causeNoImpPublicWork', label: 'Obra Publica' }, { key: 'causeNoImpThirdPartyCrash', label: 'Acc. Terceros' }, { key: 'causeNoImpOther', label: 'Otros' }
+        ];
+        const DETAIL_TRACKED_FIELDS = [...LATE_FIELDS, ...IMP_FIELDS, ...NOIMP_FIELDS].map(f => f.key);
         const { weeksDef: WEEKS_DEF } = (() => {
             const weeks = {}; let currentDate = new Date(2025, 10, 17); // Lunes 17 Nov 2025
             let weekCounter = 47; let yearForWeek = 2025; let dayCount = 0; let currentWeekKey = '';
@@ -192,19 +209,10 @@
             );
         };
 
-        const KpiCard = ({ title, value, prevValue, icon: Icon, colorClass, higherIsBetter = false, suffix = '', tooltip = '' }) => {
+        const KpiCard = ({ title, value, prevValue, icon: Icon, colorClass, higherIsBetter = false, suffix = '' }) => {
             const diff = value - prevValue; const isPos = diff > 0; const isGood = higherIsBetter ? isPos : !isPos;
-            const [showTip, setShowTip] = React.useState(false);
             return (
-                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-full relative"
-                    onMouseEnter={() => tooltip && setShowTip(true)}
-                    onMouseLeave={() => setShowTip(false)}>
-                    {showTip && (
-                        <div style={{position:'absolute',bottom:'calc(100% + 8px)',left:'50%',transform:'translateX(-50%)',zIndex:50,width:'220px',background:'#1e293b',color:'#f1f5f9',fontSize:'12px',lineHeight:'1.5',padding:'10px 12px',borderRadius:'8px',boxShadow:'0 4px 16px rgba(0,0,0,0.25)',pointerEvents:'none'}}>
-                            {tooltip}
-                            <div style={{position:'absolute',top:'100%',left:'50%',transform:'translateX(-50%)',width:0,height:0,borderLeft:'6px solid transparent',borderRight:'6px solid transparent',borderTop:'6px solid #1e293b'}}></div>
-                        </div>
-                    )}
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-full">
                     <div><div className="flex justify-between items-start mb-2"><p className="text-slate-500 text-sm font-medium">{title}</p><div className={`p-1.5 rounded-lg ${colorClass} bg-opacity-10 text-opacity-100`}><Icon /></div></div><h3 className="text-2xl font-bold text-slate-800">{value}<span className="text-base text-slate-400 ml-1">{suffix}</span></h3></div>
                     {prevValue !== null ? <div className={`flex items-center gap-1 text-xs font-bold mt-2 ${diff === 0 ? 'text-slate-400' : (isGood ? 'text-emerald-500' : 'text-red-500')}`}>{diff > 0 ? <Icons.ArrowUp /> : diff < 0 ? <Icons.ArrowDown /> : <Icons.Minus />}<span>{Math.abs(diff).toFixed(suffix === '%' ? 1 : 0)}{suffix} vs sem ant</span></div> : <div className="text-xs text-slate-300 mt-2">Sin datos previos</div>}
                 </div>
@@ -215,6 +223,7 @@
         const TransportationDashboard = () => {
             const [incidents, setIncidents] = useState([]);
             const [complaints, setComplaints] = useState([]);
+            const [dailyMetrics, setDailyMetrics] = useState([]);
             const [isLoading, setIsLoading] = useState(true);
             const [selectedWeek, setSelectedWeek] = useState('S50-25');
             const [selectedPlant, setSelectedPlant] = useState('Todas');
@@ -238,7 +247,8 @@
                 if (!db) return;
                 const u1 = db.collection("incidents").onSnapshot(s => { setIncidents(s.docs.map(d => ({ id: d.id, ...d.data() }))); setIsLoading(false); });
                 const u2 = db.collection("complaints").onSnapshot(s => { setComplaints(s.docs.map(d => ({ id: d.id, ...d.data() }))); });
-                return () => { u1(); u2(); };
+                const u3 = db.collection("daily_metrics").onSnapshot(s => { setDailyMetrics(s.docs.map(d => ({ id: d.id, ...d.data() }))); });
+                return () => { u1(); u2(); u3(); };
             }, []);
 
             const showNotification = (type, message) => { setNotification({ type, message }); setTimeout(() => setNotification(null), 3000); };
@@ -249,6 +259,36 @@
                     setIsAdmin(true); setShowLogin(false); setLoginError(false); setPasswordInput(''); showNotification('success', 'Modo Edición Activado');
                 } else { setLoginError(true); }
             };
+
+            // Devuelve un registro {serviceLevel, safetyScore, onTimeStarts} por cada combinación fecha+planta
+            // presente en `dates`/`plantFilter`. Prioriza la colección nueva "daily_metrics" (carga por día)
+            // y, si no hay dato ahí, cae en el promedio de los reportes antiguos que aún traían estos campos
+            // embebidos por turno — así los datos ya cargados no se pierden ni se ven afectados.
+            const getMetricRecordsForDates = (dates, plantFilter) => {
+                const plantsToCheck = plantFilter === 'Todas' ? PLANTS.filter(p => p !== 'Todas') : [plantFilter];
+                const records = [];
+                dates.forEach(date => {
+                    plantsToCheck.forEach(plant => {
+                        const dm = dailyMetrics.find(m => m.date === date && m.plant === plant);
+                        if (dm) {
+                            records.push({ date, plant, serviceLevel: dm.serviceLevel, safetyScore: dm.safetyScore, onTimeStarts: dm.onTimeStarts });
+                            return;
+                        }
+                        const legacy = incidents.filter(i => i.date === date && i.plant === plant && i.serviceLevel !== undefined);
+                        if (legacy.length > 0) {
+                            records.push({
+                                date, plant,
+                                serviceLevel: legacy.reduce((s, i) => s + (i.serviceLevel || 0), 0) / legacy.length,
+                                safetyScore: legacy.reduce((s, i) => s + (i.safetyScore !== undefined ? i.safetyScore : 100), 0) / legacy.length,
+                                onTimeStarts: legacy.reduce((s, i) => s + (i.onTimeStarts !== undefined ? i.onTimeStarts : 100), 0) / legacy.length
+                            });
+                        }
+                    });
+                });
+                return records;
+            };
+
+            const avgMetric = (records, key, decimals = 1) => records.length > 0 ? parseFloat((records.reduce((s, r) => s + (r[key] || 0), 0) / records.length).toFixed(decimals)) : 100;
 
             const calculateWeekStats = (weekKey) => {
                 const w = WEEKS_DEF[weekKey]; if (!w) return null;
@@ -268,11 +308,12 @@
                     c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0, c_noimp_sr:0, c_noimp_train:0, c_noimp_vand:0, c_noimp_over:0, c_noimp_event:0, c_noimp_prot:0, c_noimp_work:0, c_noimp_3rd:0 
                 });
 
+                const metricRecords = getMetricRecordsForDates(w.dates, selectedPlant);
                 return {
-                    weekLabel: w.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, lateStartsNoAff: aggs.lateStartsNoAff, lateStartsAff: aggs.lateStarts, accidents: aggs.accidents, 
-                    serviceLevel: fInc.length > 0 ? parseFloat((aggs.slSum / fInc.length).toFixed(1)) : 100,
-                    safetyScore: fInc.length > 0 ? parseFloat((aggs.safetySum / fInc.length).toFixed(1)) : 100,
-                    onTimeStarts: fInc.length > 0 ? parseFloat((aggs.onTimeSum / fInc.length).toFixed(1)) : 100, 
+                    weekLabel: w.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, lateStartsNoAff: aggs.lateStartsNoAff, lateStartsAff: aggs.lateStarts, accidents: aggs.accidents,
+                    serviceLevel: avgMetric(metricRecords, 'serviceLevel'),
+                    safetyScore: avgMetric(metricRecords, 'safetyScore'),
+                    onTimeStarts: avgMetric(metricRecords, 'onTimeStarts'),
                     totalComplaints: fCom.length, incidents: fInc, complaints: fCom, dates: w.dates, aggs
                 };
             };
@@ -292,11 +333,12 @@
                     c_imp_sleep:0, c_imp_acc:0, c_imp_route:0, c_imp_mech:0, c_imp_sup:0, c_imp_att:0, c_imp_driv:0, c_imp_flat:0, c_imp_alc:0, c_imp_diesel:0, c_imp_opth:0,
                     c_noimp_traf:0, c_noimp_weath:0, c_noimp_closed:0, c_noimp_other:0, c_noimp_sr:0, c_noimp_train:0, c_noimp_vand:0, c_noimp_over:0, c_noimp_event:0, c_noimp_prot:0, c_noimp_work:0, c_noimp_3rd:0
                 });
+                const metricRecordsMonth = getMetricRecordsForDates(mo.dates, selectedPlant);
                 return {
                     monthLabel: mo.label, totalImp: aggs.imp, totalNoImp: aggs.noImp, lateStarts: aggs.lateStarts, lateStartsNoAff: aggs.lateStartsNoAff, lateStartsAff: aggs.lateStarts, accidents: aggs.accidents,
-                    serviceLevel: fInc.length > 0 ? parseFloat((aggs.slSum / fInc.length).toFixed(1)) : 100,
-                    safetyScore: fInc.length > 0 ? parseFloat((aggs.safetySum / fInc.length).toFixed(1)) : 100,
-                    onTimeStarts: fInc.length > 0 ? parseFloat((aggs.onTimeSum / fInc.length).toFixed(1)) : 100,
+                    serviceLevel: avgMetric(metricRecordsMonth, 'serviceLevel'),
+                    safetyScore: avgMetric(metricRecordsMonth, 'safetyScore'),
+                    onTimeStarts: avgMetric(metricRecordsMonth, 'onTimeStarts'),
                     totalComplaints: fCom.length, incidents: fInc, complaints: fCom, dates: mo.dates, weekKeys: mo.weekKeys, aggs,
                     causes: {
                         imp: [
@@ -356,15 +398,16 @@
                 const dailyStats = current ? current.dates.map(d => {
                     const dayInc = current.incidents.filter(i => i.date === d);
                     const dt = new Date(d.split('/').reverse().join('-'));
-                    return { 
+                    const dayMetricRecords = getMetricRecordsForDates([d], selectedPlant);
+                    return {
                         date: d, dayName: isNaN(dt) ? '-' : dt.toLocaleDateString('es-ES', { weekday: 'short' }).toUpperCase().replace('.',''),
                         imp: dayInc.reduce((s, i) => s + (i.imp || 0), 0), noImp: dayInc.reduce((s, i) => s + (i.noImp || 0), 0),
                         lateStarts: dayInc.reduce((s, i) => s + (i.lateStarts || 0), 0),
                         lateStartsNoAff: dayInc.reduce((s, i) => s + (i.lateStartsNoAff || 0), 0),
                         accidents: dayInc.reduce((s, i) => s + (i.accidents || 0), 0),
-                        serviceLevel: dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + i.serviceLevel, 0) / dayInc.length).toFixed(1)) : 100,
-                        safetyScore: dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + (i.safetyScore || 100), 0) / dayInc.length).toFixed(1)) : 100,
-                        onTimeStarts: dayInc.length > 0 ? parseFloat((dayInc.reduce((s, i) => s + (i.onTimeStarts !== undefined ? i.onTimeStarts : 100), 0) / dayInc.length).toFixed(1)) : 100
+                        serviceLevel: avgMetric(dayMetricRecords, 'serviceLevel'),
+                        safetyScore: avgMetric(dayMetricRecords, 'safetyScore'),
+                        onTimeStarts: avgMetric(dayMetricRecords, 'onTimeStarts')
                     };
                 }) : [];
 
@@ -403,7 +446,7 @@
                     },
                     isMonthly: false
                 };
-            }, [incidents, complaints, selectedWeek, selectedPlant, viewMode, selectedMonth]);
+            }, [incidents, complaints, dailyMetrics, selectedWeek, selectedPlant, viewMode, selectedMonth]);
 
             const handleDelete = async (coll, id) => { if(confirm("¿Eliminar registro permanentemente?")) { await db.collection(coll).doc(id).delete(); showNotification('success', 'Eliminado'); }};
 
@@ -468,14 +511,14 @@
                     <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
                         {/* KPIs */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-                            <KpiCard title="Nivel Servicio" value={dashboardData.current.serviceLevel} prevValue={dashboardData.prev.serviceLevel} icon={Icons.Activity} colorClass="bg-emerald-500 text-emerald-600" higherIsBetter={true} suffix="%"  tooltip="Porcentaje de viajes que llegan a tiempo respecto al total de viajes ejecutados." />
-                            <KpiCard title="Score Seguridad" value={dashboardData.current.safetyScore} prevValue={dashboardData.prev.safetyScore} icon={Icons.Shield} colorClass="bg-blue-500 text-blue-600" higherIsBetter={true} suffix="%"  tooltip="Evaluación cuantitativa del comportamiento de manejo de los operadores basada en telemetrías." />
-                            <KpiCard title="Inicios a Tiempo" value={dashboardData.current.onTimeStarts} prevValue={dashboardData.prev.onTimeStarts} icon={Icons.CheckCircle} colorClass="bg-cyan-500 text-cyan-600" higherIsBetter={true} suffix="%"  tooltip="Porcentaje de viajes que inician su recorrido dentro de la ventana de tiempo acordada respecto al total de viajes." />
-                            <KpiCard title="Inicios Tarde c/Afect." value={dashboardData.current.lateStartsAff || 0} prevValue={dashboardData.prev.lateStartsAff !== undefined ? dashboardData.prev.lateStartsAff : null} icon={Icons.Clock} colorClass="bg-amber-500 text-amber-600"  tooltip="Número de viajes con retraso en el origen que provocaron un impacto negativo en la ventana de entrega en planta." />
+                            <KpiCard title="Nivel Servicio" value={dashboardData.current.serviceLevel} prevValue={dashboardData.prev.serviceLevel} icon={Icons.Activity} colorClass="bg-emerald-500 text-emerald-600" higherIsBetter={true} suffix="%" />
+                            <KpiCard title="Score Seguridad" value={dashboardData.current.safetyScore} prevValue={dashboardData.prev.safetyScore} icon={Icons.Shield} colorClass="bg-blue-500 text-blue-600" higherIsBetter={true} suffix="%" />
+                            <KpiCard title="Inicios a Tiempo" value={dashboardData.current.onTimeStarts} prevValue={dashboardData.prev.onTimeStarts} icon={Icons.CheckCircle} colorClass="bg-cyan-500 text-cyan-600" higherIsBetter={true} suffix="%" />
+                            <KpiCard title="Inicios Tarde c/Afect." value={dashboardData.current.lateStartsAff || 0} prevValue={dashboardData.prev.lateStartsAff !== undefined ? dashboardData.prev.lateStartsAff : null} icon={Icons.Clock} colorClass="bg-amber-500 text-amber-600" />
                             
-                            <KpiCard title="Fallas Imputables" value={dashboardData.current.totalImp || 0} prevValue={dashboardData.prev.totalImp} icon={Icons.BarChart2} colorClass="bg-rose-500 text-rose-600"  tooltip="Incidentes atribuibles a la operación (ej. fallas mecánicas, retraso del operador) que causan un retraso en la entrega en planta." />
-                            <KpiCard title="Percances" value={dashboardData.current.accidents} prevValue={dashboardData.prev.accidents} icon={Icons.AlertOctagon} colorClass="bg-orange-500 text-orange-600"  tooltip="Número total de accidentes, colisiones o siniestros viales registrados durante la ejecución del servicio." />
-                             <KpiCard title="Quejas" value={dashboardData.current.totalComplaints} prevValue={dashboardData.prev.totalComplaints} icon={Icons.MessageSquare} colorClass="bg-purple-500 text-purple-600"  tooltip="Reportes o inconformidades del cliente por desviaciones en el servicio (ej. limpieza de la unidad, actitud del operador, falta de EPP) que no alteran el tiempo de entrega." />
+                            <KpiCard title="Fallas Imputables" value={dashboardData.current.totalImp || 0} prevValue={dashboardData.prev.totalImp} icon={Icons.BarChart2} colorClass="bg-rose-500 text-rose-600" />
+                            <KpiCard title="Percances" value={dashboardData.current.accidents} prevValue={dashboardData.prev.accidents} icon={Icons.AlertOctagon} colorClass="bg-orange-500 text-orange-600" />
+                             <KpiCard title="Quejas" value={dashboardData.current.totalComplaints} prevValue={dashboardData.prev.totalComplaints} icon={Icons.MessageSquare} colorClass="bg-purple-500 text-purple-600" />
                         </div>
 
                         {/* GRÁFICAS PRINCIPALES */}
@@ -595,9 +638,6 @@
                                                     <th className="p-3">Fecha</th>
                                                     <th className="p-3">Planta</th>
                                                     <th className="p-3 text-center">Fallas</th>
-                                                    <th className="p-3 text-center">N.S.</th>
-                                                    <th className="p-3 text-center bg-blue-50 text-blue-600">Seg%</th>
-                                                    <th className="p-3 text-center bg-cyan-50 text-cyan-600">A Tiempo%</th>
                                                     <th className="p-3 text-center bg-amber-50 text-amber-600">I.T. c/Af.</th>
                                                     <th className="p-3 text-center bg-amber-50 text-amber-400">I.T. s/Af.</th>
                                                     <th className="p-3 text-center bg-orange-50 text-orange-600">Perc.</th>
@@ -610,9 +650,6 @@
                                                         <td className="p-3 text-slate-600 font-medium">{inc.date.slice(0,5)}</td>
                                                         <td className="p-3"><div className="font-bold text-slate-700">{inc.plant}</div><div className="text-xs text-slate-400">{inc.shift}</div></td>
                                                         <td className="p-3 text-center"><span className="font-bold text-red-700">{inc.imp}</span> / <span className="text-slate-600 font-bold">{inc.noImp}</span></td>
-                                                        <td className="p-3 text-center"><span className={`font-bold ${inc.serviceLevel >= 98 ? 'text-emerald-600' : 'text-red-600'}`}>{inc.serviceLevel}%</span></td>
-                                                        <td className="p-3 text-center font-bold text-blue-600 bg-blue-50/30">{inc.safetyScore || 100}%</td>
-                                                        <td className="p-3 text-center font-bold text-cyan-600 bg-cyan-50/30">{inc.onTimeStarts !== undefined ? inc.onTimeStarts : 100}%</td>
                                                         <td className="p-3 text-center font-bold text-amber-600 bg-amber-50/30">{inc.lateStarts || 0}</td>
                                                         <td className="p-3 text-center font-bold text-amber-400 bg-amber-50/20">{inc.lateStartsNoAff || 0}</td>
                                                         <td className="p-3 text-center font-bold text-orange-600 bg-orange-50/30">{inc.accidents || 0}</td>
@@ -628,38 +665,83 @@
                                 </div>
                             )}
 
+                            {/* TABLA DE DATOS DIARIOS (ABAJO Y ANCHO COMPLETO) - SOLO VISIBLE PARA ADMIN */}
+                            {isAdmin && (
+                                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden fade-in">
+                                    <div className="p-4 bg-slate-50 font-bold border-b flex justify-between items-center"><span className="flex gap-2 items-center"><span className="text-cyan-500"><Icons.CheckCircle /></span> Datos Diarios (Admin)</span> <span className="text-xs bg-cyan-100 text-cyan-700 px-2 py-1 rounded-full">{dailyMetrics.length}</span></div>
+                                    <div className="max-h-60 overflow-y-auto">
+                                        <table className="w-full text-sm text-left">
+                                            <thead className="sticky top-0 bg-slate-50 text-slate-500 shadow-sm z-10">
+                                                <tr>
+                                                    <th className="p-3">Fecha</th>
+                                                    <th className="p-3">Planta</th>
+                                                    <th className="p-3 text-center bg-emerald-50 text-emerald-600">N.S.</th>
+                                                    <th className="p-3 text-center bg-blue-50 text-blue-600">Seg%</th>
+                                                    <th className="p-3 text-center bg-cyan-50 text-cyan-600">A Tiempo%</th>
+                                                    {isAdmin && <th className="p-3"></th>}
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y">
+                                                {dailyMetrics.length === 0 && <tr><td colSpan="6" className="p-4 text-center text-slate-400">Sin datos diarios capturados.</td></tr>}
+                                                {[...dailyMetrics].sort((a,b) => (b.date||'').localeCompare(a.date||'')).map(dm => (
+                                                    <tr key={dm.id} className="hover:bg-slate-50">
+                                                        <td className="p-3 text-slate-600 font-medium">{(dm.date||'').slice(0,5)}</td>
+                                                        <td className="p-3 font-bold text-slate-700">{dm.plant}</td>
+                                                        <td className="p-3 text-center font-bold text-emerald-600 bg-emerald-50/30">{dm.serviceLevel}%</td>
+                                                        <td className="p-3 text-center font-bold text-blue-600 bg-blue-50/30">{dm.safetyScore}%</td>
+                                                        <td className="p-3 text-center font-bold text-cyan-600 bg-cyan-50/30">{dm.onTimeStarts}%</td>
+                                                        {isAdmin && <td className="p-3 text-right min-w-[80px]">
+                                                            <button onClick={() => handleEdit(dm, 'daily')} className="text-blue-400 hover:text-blue-600 mr-2" title="Editar"><Icons.Edit /></button>
+                                                            <button onClick={()=>handleDelete('daily_metrics', dm.id)} className="text-slate-300 hover:text-red-500" title="Eliminar"><Icons.Trash2 /></button>
+                                                        </td>}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+
                         </div>
                     </main>
 
                     {/* MODAL FORM */}
                     {isModalOpen && (
-                        <ModalForm 
-                            close={() => setIsModalOpen(false)} 
+                        <ModalForm
+                            close={() => setIsModalOpen(false)}
                             plants={PLANTS.filter(p => p !== 'Todas')}
                             initialData={editingItem}
                             initialTab={modalTab}
+                            editing={!!editingItem}
                             onSaveIncident={(data) => {
                                 const [y, m, d] = data.date.split('-');
                                 const imp = (parseInt(data.causeImpSleep)||0) + (parseInt(data.causeImpAccident)||0) + (parseInt(data.causeImpRoute)||0) + (parseInt(data.causeImpMech)||0) + (parseInt(data.causeImpSupervisor)||0) + (parseInt(data.causeImpAttitude)||0) + (parseInt(data.causeImpDriving)||0) + (parseInt(data.causeImpFlatTire)||0) + (parseInt(data.causeImpAlcohol)||0) + (parseInt(data.causeImpDiesel)||0) + (parseInt(data.causeImpOpTheme)||0);
                                 const noImp = (parseInt(data.causeNoImpTraffic)||0) + (parseInt(data.causeNoImpWeather)||0) + (parseInt(data.causeNoImpClosed)||0) + (parseInt(data.causeNoImpOther)||0) + (parseInt(data.causeNoImpCrashNoResp)||0) + (parseInt(data.causeNoImpTrain)||0) + (parseInt(data.causeNoImpVandalism)||0) + (parseInt(data.causeNoImpOvercapacity)||0) + (parseInt(data.causeNoImpPublicEvent)||0) + (parseInt(data.causeNoImpProtest)||0) + (parseInt(data.causeNoImpPublicWork)||0) + (parseInt(data.causeNoImpThirdPartyCrash)||0);
-                                
-                                const payload = { 
-                                    ...data, 
-                                    date: `${d}/${m}/${y.slice(-2)}`, 
-                                    imp, noImp, 
+
+                                const payload = {
+                                    date: `${d}/${m}/${y.slice(-2)}`,
+                                    plant: data.plant, shift: data.shift,
+                                    imp, noImp,
                                     lateStarts: parseInt(data.lateStarts)||0,
                                     lateStartsNoAff: parseInt(data.lateStartsNoAff)||0,
-                                    serviceLevel: parseFloat(data.serviceLevel)||100, 
-                                    safetyScore: parseFloat(data.safetyScore)||100,
-                                    onTimeStarts: parseFloat(data.onTimeStarts)||100,
                                     accidents: parseInt(data.accidents)||0,
-                                    
+
                                     causeImpSleep: parseInt(data.causeImpSleep)||0, causeImpAccident: parseInt(data.causeImpAccident)||0, causeImpRoute: parseInt(data.causeImpRoute)||0, causeImpMech: parseInt(data.causeImpMech)||0,
                                     causeImpSupervisor: parseInt(data.causeImpSupervisor)||0, causeImpAttitude: parseInt(data.causeImpAttitude)||0, causeImpDriving: parseInt(data.causeImpDriving)||0, causeImpFlatTire: parseInt(data.causeImpFlatTire)||0, causeImpAlcohol: parseInt(data.causeImpAlcohol)||0, causeImpDiesel: parseInt(data.causeImpDiesel)||0, causeImpOpTheme: parseInt(data.causeImpOpTheme)||0,
-                                    
+
                                     causeNoImpTraffic: parseInt(data.causeNoImpTraffic)||0, causeNoImpWeather: parseInt(data.causeNoImpWeather)||0, causeNoImpClosed: parseInt(data.causeNoImpClosed)||0, causeNoImpOther: parseInt(data.causeNoImpOther)||0,
                                     causeNoImpCrashNoResp: parseInt(data.causeNoImpCrashNoResp)||0, causeNoImpTrain: parseInt(data.causeNoImpTrain)||0, causeNoImpVandalism: parseInt(data.causeNoImpVandalism)||0, causeNoImpOvercapacity: parseInt(data.causeNoImpOvercapacity)||0, causeNoImpPublicEvent: parseInt(data.causeNoImpPublicEvent)||0, causeNoImpProtest: parseInt(data.causeNoImpProtest)||0, causeNoImpPublicWork: parseInt(data.causeNoImpPublicWork)||0, causeNoImpThirdPartyCrash: parseInt(data.causeNoImpThirdPartyCrash)||0
                                 };
+
+                                // Detalle por ocurrencia (ruta + minutos tarde) de cada campo contable rastreado.
+                                DETAIL_TRACKED_FIELDS.forEach(key => {
+                                    const n = payload[key] || 0;
+                                    const prevDetails = (data[key + 'Details'] || []);
+                                    payload[key + 'Details'] = Array.from({ length: n }, (_, i) => ({
+                                        route: (prevDetails[i] && prevDetails[i].route) || '',
+                                        minutes: (prevDetails[i] && prevDetails[i].minutes !== undefined && prevDetails[i].minutes !== '') ? (parseInt(prevDetails[i].minutes) || 0) : ''
+                                    }));
+                                });
 
                                 if (editingItem) {
                                     db.collection("incidents").doc(editingItem.id).update(payload);
@@ -668,7 +750,22 @@
                                     db.collection("incidents").add(payload);
                                     showNotification('success', 'Guardado');
                                 }
-                                setIsModalOpen(false); 
+                                setIsModalOpen(false);
+                            }}
+                            onSaveDailyMetrics={(data) => {
+                                const [y, m, d] = data.date.split('-');
+                                const docId = `${d}-${m}-${y.slice(-2)}_${data.plant}`;
+                                const payload = {
+                                    date: `${d}/${m}/${y.slice(-2)}`,
+                                    plant: data.plant,
+                                    serviceLevel: parseFloat(data.serviceLevel)||0,
+                                    safetyScore: parseFloat(data.safetyScore)||0,
+                                    onTimeStarts: parseFloat(data.onTimeStarts)||0
+                                };
+                                db.collection("daily_metrics").doc(docId).set(payload, { merge: true }).then(() => {
+                                    showNotification('success', editingItem ? 'Datos Actualizados' : 'Datos Guardados');
+                                });
+                                setIsModalOpen(false);
                             }}
                             onSaveComplaint={(data) => {
                                 const [y, m, d] = data.date.split('-');
@@ -697,105 +794,130 @@
             );
         };
 
-        const ModalForm = ({ close, plants, onSaveIncident, onSaveComplaint, onSeed, initialData, initialTab }) => {
-            const [tab, setTab] = useState(initialTab || 'incident'); 
-            
+        // --- CONTADOR CON DETALLE DE RUTA/MINUTOS TARDE POR OCURRENCIA ---
+        const CountWithDetails = ({ label, field, value, details, onCountChange, onDetailChange }) => (
+            <div className="border border-slate-200 rounded p-2 bg-white">
+                <div className="flex justify-between items-center gap-2">
+                    <label className="text-xs">{label}</label>
+                    <input type="number" min="0" value={value} onChange={e => onCountChange(field, e.target.value)} className="w-12 border rounded text-center text-sm"/>
+                </div>
+                {details && details.length > 0 && (
+                    <div className="mt-1.5 space-y-1 pl-2 border-l-2 border-rose-200">
+                        {details.map((d, i) => (
+                            <div key={i} className="flex gap-1 items-center">
+                                <input type="text" placeholder={`Ruta #${i + 1}`} value={d.route} onChange={e => onDetailChange(field, i, 'route', e.target.value)} className="flex-1 min-w-0 border rounded text-[11px] p-1" title="Nombre de la ruta"/>
+                                <input type="number" placeholder="Min" value={d.minutes} onChange={e => onDetailChange(field, i, 'minutes', e.target.value)} className="w-14 border rounded text-[11px] p-1" title="Minutos tarde"/>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+
+        const ModalForm = ({ close, plants, onSaveIncident, onSaveComplaint, onSaveDailyMetrics, onSeed, initialData, initialTab }) => {
+            const [tab, setTab] = useState(initialTab || 'incident');
+
             const parseDate = (dStr) => {
                 if(!dStr) return new Date().toISOString().split('T')[0];
                 const [d, m, y] = dStr.split('/');
                 return `20${y}-${m}-${d}`;
             };
 
-            const [formData, setFormData] = useState({ 
-                date: initialData ? parseDate(initialData.date) : new Date().toISOString().split('T')[0], 
-                plant: initialData?.plant || 'Camiones', 
-                shift: initialData?.shift || 'T1', 
-                serviceLevel: initialData?.serviceLevel !== undefined ? initialData.serviceLevel : 99.0, 
-                safetyScore: initialData?.safetyScore !== undefined ? initialData.safetyScore : 100, 
-                onTimeStarts: initialData?.onTimeStarts !== undefined ? initialData.onTimeStarts : 100, 
-                lateStarts: initialData?.lateStarts || 0, 
-                lateStartsNoAff: initialData?.lateStartsNoAff || 0,
-                accidents: initialData?.accidents || 0, 
-                
-                // Imputables
-                causeImpSleep: initialData?.causeImpSleep || 0, causeImpAccident: initialData?.causeImpAccident || 0, causeImpRoute: initialData?.causeImpRoute || 0, causeImpMech: initialData?.causeImpMech || 0, 
-                causeImpSupervisor: initialData?.causeImpSupervisor || 0, causeImpAttitude: initialData?.causeImpAttitude || 0, causeImpDriving: initialData?.causeImpDriving || 0, causeImpFlatTire: initialData?.causeImpFlatTire || 0, causeImpAlcohol: initialData?.causeImpAlcohol || 0, causeImpDiesel: initialData?.causeImpDiesel || 0, causeImpOpTheme: initialData?.causeImpOpTheme || 0,
-                
-                // No Imputables
-                causeNoImpTraffic: initialData?.causeNoImpTraffic || 0, causeNoImpWeather: initialData?.causeNoImpWeather || 0, causeNoImpClosed: initialData?.causeNoImpClosed || 0, causeNoImpOther: initialData?.causeNoImpOther || 0, 
-                causeNoImpCrashNoResp: initialData?.causeNoImpCrashNoResp || 0, causeNoImpTrain: initialData?.causeNoImpTrain || 0, causeNoImpVandalism: initialData?.causeNoImpVandalism || 0, causeNoImpOvercapacity: initialData?.causeNoImpOvercapacity || 0, causeNoImpPublicEvent: initialData?.causeNoImpPublicEvent || 0, causeNoImpProtest: initialData?.causeNoImpProtest || 0, causeNoImpPublicWork: initialData?.causeNoImpPublicWork || 0, causeNoImpThirdPartyCrash: initialData?.causeNoImpThirdPartyCrash || 0,
-                
-                // Quejas
-                route: initialData?.route || '', 
-                issue: initialData?.issue || 'Retraso', 
-                detail: initialData?.detail || '', 
-                action: initialData?.action || '', 
-                source: initialData?.source || 'Laborales', 
-                type: initialData?.type || 'Servicio' 
+            const buildDetails = (n, existing) => Array.from({ length: n }, (_, i) => ({
+                route: (existing && existing[i] && existing[i].route) || '',
+                minutes: (existing && existing[i] && existing[i].minutes !== undefined) ? existing[i].minutes : ''
+            }));
+
+            const [formData, setFormData] = useState(() => {
+                const base = {
+                    date: initialData ? parseDate(initialData.date) : new Date().toISOString().split('T')[0],
+                    plant: initialData?.plant || 'Camiones',
+                    shift: initialData?.shift || 'T1',
+                    serviceLevel: initialData?.serviceLevel !== undefined ? initialData.serviceLevel : 99.0,
+                    safetyScore: initialData?.safetyScore !== undefined ? initialData.safetyScore : 100,
+                    onTimeStarts: initialData?.onTimeStarts !== undefined ? initialData.onTimeStarts : 100,
+                    accidents: initialData?.accidents || 0,
+
+                    // Quejas
+                    route: initialData?.route || '',
+                    issue: initialData?.issue || 'Retraso',
+                    detail: initialData?.detail || '',
+                    action: initialData?.action || '',
+                    source: initialData?.source || 'Laborales',
+                    type: initialData?.type || 'Servicio'
+                };
+                [...LATE_FIELDS, ...IMP_FIELDS, ...NOIMP_FIELDS].forEach(f => {
+                    const n = initialData?.[f.key] || 0;
+                    base[f.key] = n;
+                    base[f.key + 'Details'] = buildDetails(n, initialData?.[f.key + 'Details']);
+                });
+                return base;
             });
 
             const handleChange = (e) => setFormData(p => ({ ...p, [e.target.name]: e.target.value }));
-            
+
+            const handleCountChange = (field, value) => {
+                const n = Math.max(0, parseInt(value) || 0);
+                setFormData(p => ({ ...p, [field]: value, [field + 'Details']: buildDetails(n, p[field + 'Details']) }));
+            };
+
+            const handleDetailChange = (field, idx, key, value) => {
+                setFormData(p => {
+                    const arr = [...(p[field + 'Details'] || [])];
+                    arr[idx] = { ...arr[idx], [key]: value };
+                    return { ...p, [field + 'Details']: arr };
+                });
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (tab === 'incident') onSaveIncident(formData);
+                else if (tab === 'complaint') onSaveComplaint(formData);
+                else onSaveDailyMetrics(formData);
+            };
+
+            const tabBtnCls = (t) => `flex-1 py-3 font-bold ${tab===t?'text-rose-600 border-b-2 border-rose-600':'text-slate-500'} ${initialData && 'cursor-not-allowed opacity-50'}`;
+
             return (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col max-h-[95vh]">
                         <div className="bg-slate-900 p-4 flex justify-between text-white"><h2 className="font-bold flex gap-2"><Icons.Plus/> {initialData ? 'Editar Registro' : 'Nuevo Registro'}</h2><button onClick={close}><Icons.X/></button></div>
                         <div className="flex border-b">
-                            <button onClick={()=>!initialData && setTab('incident')} className={`flex-1 py-3 font-bold ${tab==='incident'?'text-rose-600 border-b-2 border-rose-600':'text-slate-500'} ${initialData && 'cursor-not-allowed opacity-50'}`}>Reporte</button>
-                            <button onClick={()=>!initialData && setTab('complaint')} className={`flex-1 py-3 font-bold ${tab==='complaint'?'text-rose-600 border-b-2 border-rose-600':'text-slate-500'} ${initialData && 'cursor-not-allowed opacity-50'}`}>Queja</button>
+                            <button type="button" onClick={()=>!initialData && setTab('incident')} className={tabBtnCls('incident')}>Reporte</button>
+                            <button type="button" onClick={()=>!initialData && setTab('complaint')} className={tabBtnCls('complaint')}>Queja</button>
+                            <button type="button" onClick={()=>!initialData && setTab('daily')} className={tabBtnCls('daily')}>Datos</button>
                         </div>
-                        <div className="p-6 overflow-y-auto"><form id="f" onSubmit={(e)=>{e.preventDefault(); tab==='incident'?onSaveIncident(formData):onSaveComplaint(formData)}} className="space-y-4">
+                        <div className="p-6 overflow-y-auto"><form id="f" onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-2 gap-4"><div><label className="text-xs font-bold text-slate-500">Fecha</label><input type="date" name="date" required value={formData.date} onChange={handleChange} className="w-full border rounded p-2 text-sm"/></div><div><label className="text-xs font-bold text-slate-500">Planta</label><select name="plant" value={formData.plant} onChange={handleChange} className="w-full border rounded p-2 text-sm">{plants.map(p=><option key={p}>{p}</option>)}</select></div></div>
-                            {tab === 'incident' ? (
+                            {tab === 'incident' && (
                                 <>
-                                    <div className="grid grid-cols-3 gap-4 bg-slate-50 p-3 rounded border mb-2">
-                                         <div><label className="text-xs font-bold text-emerald-600">Nivel Servicio %</label><input type="number" step="0.1" name="serviceLevel" value={formData.serviceLevel} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-emerald-600"/></div>
-                                         <div><label className="text-xs font-bold text-blue-600">Score Seguridad %</label><input type="number" step="0.1" name="safetyScore" value={formData.safetyScore} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-blue-600"/></div>
-                                         <div><label className="text-xs font-bold text-cyan-600">Inicios a Tiempo %</label><input type="number" step="0.1" name="onTimeStarts" value={formData.onTimeStarts} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-cyan-600"/></div>
-                                    </div>
-                                    <div className="grid grid-cols-4 gap-2 bg-slate-50 p-3 rounded border">
+                                    <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded border">
                                         <div><label className="text-xs font-bold text-slate-500">Turno</label><select name="shift" value={formData.shift} onChange={handleChange} className="w-full border rounded p-1 text-sm"><option>T1</option><option>T2</option><option>T3</option></select></div>
-                                        <div><label className="text-xs font-bold text-amber-600">I. Tarde c/Afect.</label><input type="number" name="lateStarts" value={formData.lateStarts} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
-                                        <div><label className="text-xs font-bold text-amber-400">I. Tarde s/Afect.</label><input type="number" name="lateStartsNoAff" value={formData.lateStartsNoAff} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
                                         <div><label className="text-xs font-bold text-slate-500">Percances</label><input type="number" name="accidents" value={formData.accidents} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
+                                    </div>
+                                    <div className="border border-amber-100 p-3 bg-amber-50/40 rounded">
+                                        <h4 className="text-sm font-bold text-amber-600 mb-2 border-b border-amber-200 pb-1">Inicios Tarde <span className="font-normal text-amber-400">(ruta y minutos por cada uno)</span></h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                            {LATE_FIELDS.map(f => <CountWithDetails key={f.key} label={f.label} field={f.key} value={formData[f.key]} details={formData[f.key + 'Details']} onCountChange={handleCountChange} onDetailChange={handleDetailChange} />)}
+                                        </div>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                                         {/* IMPUTABLES */}
-                                        <div className="border-rose-100 border p-3 bg-rose-50/50 rounded"><h4 className="text-sm font-bold text-rose-600 mb-3 border-b border-rose-200 pb-1">Imputables</h4>
-                                            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                                                <div className="flex justify-between items-center"><label className="text-xs">Op. Dormido</label><input type="number" name="causeImpSleep" value={formData.causeImpSleep} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Siniestro</label><input type="number" name="causeImpAccident" value={formData.causeImpAccident} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Desvío Ruta</label><input type="number" name="causeImpRoute" value={formData.causeImpRoute} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Falla Mec.</label><input type="number" name="causeImpMech" value={formData.causeImpMech} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Supervisor</label><input type="number" name="causeImpSupervisor" value={formData.causeImpSupervisor} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Actitud de Op</label><input type="number" name="causeImpAttitude" value={formData.causeImpAttitude} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Mal Manejo</label><input type="number" name="causeImpDriving" value={formData.causeImpDriving} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Ponchadura</label><input type="number" name="causeImpFlatTire" value={formData.causeImpFlatTire} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Alcoholemia</label><input type="number" name="causeImpAlcohol" value={formData.causeImpAlcohol} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Diesel</label><input type="number" name="causeImpDiesel" value={formData.causeImpDiesel} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Tema de Op.</label><input type="number" name="causeImpOpTheme" value={formData.causeImpOpTheme} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                        <div className="border-rose-100 border p-3 bg-rose-50/50 rounded"><h4 className="text-sm font-bold text-rose-600 mb-3 border-b border-rose-200 pb-1">Imputables <span className="font-normal text-rose-300">(ruta y minutos por cada uno)</span></h4>
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {IMP_FIELDS.map(f => <CountWithDetails key={f.key} label={f.label} field={f.key} value={formData[f.key]} details={formData[f.key + 'Details']} onCountChange={handleCountChange} onDetailChange={handleDetailChange} />)}
                                             </div>
                                         </div>
                                         {/* NO IMPUTABLES */}
-                                        <div className="border-slate-200 border p-3 bg-slate-50 rounded"><h4 className="text-sm font-bold text-slate-500 mb-3 border-b border-slate-200 pb-1">No Imputables</h4>
-                                            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                                                <div className="flex justify-between items-center"><label className="text-xs">Tráfico</label><input type="number" name="causeNoImpTraffic" value={formData.causeNoImpTraffic} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Calle Cerrada</label><input type="number" name="causeNoImpClosed" value={formData.causeNoImpClosed} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Clima</label><input type="number" name="causeNoImpWeather" value={formData.causeNoImpWeather} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Percance S/R</label><input type="number" name="causeNoImpCrashNoResp" value={formData.causeNoImpCrashNoResp} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Tren</label><input type="number" name="causeNoImpTrain" value={formData.causeNoImpTrain} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Vandalismo</label><input type="number" name="causeNoImpVandalism" value={formData.causeNoImpVandalism} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Sobreaforo</label><input type="number" name="causeNoImpOvercapacity" value={formData.causeNoImpOvercapacity} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Evento Publico</label><input type="number" name="causeNoImpPublicEvent" value={formData.causeNoImpPublicEvent} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Manifestación</label><input type="number" name="causeNoImpProtest" value={formData.causeNoImpProtest} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Obra Publica</label><input type="number" name="causeNoImpPublicWork" value={formData.causeNoImpPublicWork} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Acc. Terceros</label><input type="number" name="causeNoImpThirdPartyCrash" value={formData.causeNoImpThirdPartyCrash} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
-                                                <div className="flex justify-between items-center"><label className="text-xs">Otros</label><input type="number" name="causeNoImpOther" value={formData.causeNoImpOther} onChange={handleChange} className="w-12 border rounded text-center text-sm"/></div>
+                                        <div className="border-slate-200 border p-3 bg-slate-50 rounded"><h4 className="text-sm font-bold text-slate-500 mb-3 border-b border-slate-200 pb-1">No Imputables <span className="font-normal text-slate-400">(ruta y minutos por cada uno)</span></h4>
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {NOIMP_FIELDS.map(f => <CountWithDetails key={f.key} label={f.label} field={f.key} value={formData[f.key]} details={formData[f.key + 'Details']} onCountChange={handleCountChange} onDetailChange={handleDetailChange} />)}
                                             </div>
                                         </div>
                                     </div>
                                 </>
-                            ) : (
+                            )}
+                            {tab === 'complaint' && (
                                 <>
                                     <input type="text" name="route" placeholder="Ruta" value={formData.route} onChange={handleChange} className="w-full border rounded p-2 text-sm"/>
                                     <div className="grid grid-cols-2 gap-4">
@@ -812,10 +934,18 @@
                                     <textarea name="detail" placeholder="Detalle de la queja..." rows="3" value={formData.detail} onChange={handleChange} className="w-full border rounded p-2 text-sm"></textarea>
                                 </>
                             )}
+                            {tab === 'daily' && (
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-3 rounded border">
+                                    <div><label className="text-xs font-bold text-emerald-600">Nivel Servicio %</label><input type="number" step="0.1" name="serviceLevel" value={formData.serviceLevel} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-emerald-600"/></div>
+                                    <div><label className="text-xs font-bold text-blue-600">Score Seguridad %</label><input type="number" step="0.1" name="safetyScore" value={formData.safetyScore} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-blue-600"/></div>
+                                    <div><label className="text-xs font-bold text-cyan-600">Inicios a Tiempo %</label><input type="number" step="0.1" name="onTimeStarts" value={formData.onTimeStarts} onChange={handleChange} className="w-full border rounded p-1 text-sm font-bold text-cyan-600"/></div>
+                                    <p className="sm:col-span-3 text-[11px] text-slate-400">Estos valores se capturan una vez por día y planta. Al guardar se reemplaza el dato existente para esa fecha y planta (no se duplica por turno).</p>
+                                </div>
+                            )}
                         </form></div>
                         <div className="p-4 border-t bg-slate-50 flex justify-between">
                             {!initialData ? <button type="button" onClick={onSeed} className="text-xs text-slate-400 flex gap-1 items-center"><Icons.CloudUpload/> Demo</button> : <div></div>}
-                            <div className="flex gap-2"><button onClick={close} className="px-4 py-2 rounded text-sm hover:bg-slate-200">Cancelar</button><button type="submit" form="f" className="px-4 py-2 rounded text-sm bg-rose-600 text-white hover:bg-rose-700 shadow">{initialData ? 'Actualizar' : 'Guardar'}</button></div>
+                            <div className="flex gap-2"><button type="button" onClick={close} className="px-4 py-2 rounded text-sm hover:bg-slate-200">Cancelar</button><button type="submit" form="f" className="px-4 py-2 rounded text-sm bg-rose-600 text-white hover:bg-rose-700 shadow">{initialData ? 'Actualizar' : 'Guardar'}</button></div>
                         </div>
                     </div>
                 </div>
