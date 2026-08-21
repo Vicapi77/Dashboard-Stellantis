@@ -641,6 +641,7 @@
                                                     <th className="p-3 text-center bg-amber-50 text-amber-600">I.T. c/Af.</th>
                                                     <th className="p-3 text-center bg-amber-50 text-amber-400">I.T. s/Af.</th>
                                                     <th className="p-3 text-center bg-orange-50 text-orange-600">Perc.</th>
+                                                    <th className="p-3 text-center bg-indigo-50 text-indigo-600">F. Mec.</th>
                                                     {isAdmin && <th className="p-3"></th>}
                                                 </tr>
                                             </thead>
@@ -653,6 +654,7 @@
                                                         <td className="p-3 text-center font-bold text-amber-600 bg-amber-50/30">{inc.lateStarts || 0}</td>
                                                         <td className="p-3 text-center font-bold text-amber-400 bg-amber-50/20">{inc.lateStartsNoAff || 0}</td>
                                                         <td className="p-3 text-center font-bold text-orange-600 bg-orange-50/30">{inc.accidents || 0}</td>
+                                                        <td className="p-3 text-center font-bold text-indigo-600 bg-indigo-50/30">{inc.mechanicalFailures || 0}</td>
                                                         {isAdmin && <td className="p-3 text-right min-w-[80px]">
                                                             <button onClick={() => handleEdit(inc, 'incident')} className="text-blue-400 hover:text-blue-600 mr-2" title="Editar"><Icons.Edit /></button>
                                                             <button onClick={()=>handleDelete('incidents', inc.id)} className="text-slate-300 hover:text-red-500" title="Eliminar"><Icons.Trash2 /></button>
@@ -725,6 +727,7 @@
                                     lateStarts: parseInt(data.lateStarts)||0,
                                     lateStartsNoAff: parseInt(data.lateStartsNoAff)||0,
                                     accidents: parseInt(data.accidents)||0,
+                                    mechanicalFailures: parseInt(data.mechanicalFailures)||0,
 
                                     causeImpSleep: parseInt(data.causeImpSleep)||0, causeImpAccident: parseInt(data.causeImpAccident)||0, causeImpRoute: parseInt(data.causeImpRoute)||0, causeImpMech: parseInt(data.causeImpMech)||0,
                                     causeImpSupervisor: parseInt(data.causeImpSupervisor)||0, causeImpAttitude: parseInt(data.causeImpAttitude)||0, causeImpDriving: parseInt(data.causeImpDriving)||0, causeImpFlatTire: parseInt(data.causeImpFlatTire)||0, causeImpAlcohol: parseInt(data.causeImpAlcohol)||0, causeImpDiesel: parseInt(data.causeImpDiesel)||0, causeImpOpTheme: parseInt(data.causeImpOpTheme)||0,
@@ -742,6 +745,23 @@
                                         minutes: (prevDetails[i] && prevDetails[i].minutes !== undefined && prevDetails[i].minutes !== '') ? (parseInt(prevDetails[i].minutes) || 0) : ''
                                     }));
                                 });
+
+                                // Detalle por ocurrencia de Accidentes (severidad + descripción) y Fallas Mecánicas (ruta + ID unidad + descripción).
+                                {
+                                    const nAcc = payload.accidents || 0;
+                                    const prevAcc = data.accidentsDetails || [];
+                                    payload.accidentsDetails = Array.from({ length: nAcc }, (_, i) => ({
+                                        severity: (prevAcc[i] && prevAcc[i].severity) || 'moderado',
+                                        description: (prevAcc[i] && prevAcc[i].description) || ''
+                                    }));
+                                    const nMech = payload.mechanicalFailures || 0;
+                                    const prevMech = data.mechanicalFailuresDetails || [];
+                                    payload.mechanicalFailuresDetails = Array.from({ length: nMech }, (_, i) => ({
+                                        route: (prevMech[i] && prevMech[i].route) || '',
+                                        unitId: (prevMech[i] && prevMech[i].unitId) || '',
+                                        description: (prevMech[i] && prevMech[i].description) || ''
+                                    }));
+                                }
 
                                 if (editingItem) {
                                     db.collection("incidents").doc(editingItem.id).update(payload);
@@ -814,6 +834,38 @@
             </div>
         );
 
+        // --- DETALLE POR OCURRENCIA DE ACCIDENTES (severidad + descripción) ---
+        const AccidentDetails = ({ field, details, onDetailChange }) => (
+            !details || details.length === 0 ? null : (
+                <div className="mt-2 space-y-1.5 pl-2 border-l-2 border-orange-200">
+                    {details.map((d, i) => (
+                        <div key={i} className="flex gap-1 items-center">
+                            <select value={d.severity} onChange={e => onDetailChange(field, i, 'severity', e.target.value)} className="border rounded text-[11px] p-1 bg-white">
+                                <option value="grave">Grave</option>
+                                <option value="moderado">Moderado</option>
+                            </select>
+                            <input type="text" placeholder={`Descripción del accidente #${i + 1}`} value={d.description} onChange={e => onDetailChange(field, i, 'description', e.target.value)} className="flex-1 min-w-0 border rounded text-[11px] p-1" title="Breve descripción del accidente"/>
+                        </div>
+                    ))}
+                </div>
+            )
+        );
+
+        // --- DETALLE POR OCURRENCIA DE FALLAS MECÁNICAS (ruta + ID de unidad + descripción) ---
+        const MechanicalFailureDetails = ({ field, details, onDetailChange }) => (
+            !details || details.length === 0 ? null : (
+                <div className="mt-2 space-y-1.5 pl-2 border-l-2 border-indigo-200">
+                    {details.map((d, i) => (
+                        <div key={i} className="grid grid-cols-3 gap-1">
+                            <input type="text" placeholder="Ruta" value={d.route} onChange={e => onDetailChange(field, i, 'route', e.target.value)} className="border rounded text-[11px] p-1" title="Nombre de la ruta"/>
+                            <input type="number" placeholder="ID Unidad" value={d.unitId} onChange={e => onDetailChange(field, i, 'unitId', e.target.value)} className="border rounded text-[11px] p-1" title="ID de la unidad"/>
+                            <input type="text" placeholder="Falla" value={d.description} onChange={e => onDetailChange(field, i, 'description', e.target.value)} className="border rounded text-[11px] p-1" title="Descripción de la falla"/>
+                        </div>
+                    ))}
+                </div>
+            )
+        );
+
         const ModalForm = ({ close, plants, onSaveIncident, onSaveComplaint, onSaveDailyMetrics, onSeed, initialData, initialTab }) => {
             const [tab, setTab] = useState(initialTab || 'incident');
 
@@ -827,6 +879,16 @@
                 route: (existing && existing[i] && existing[i].route) || '',
                 minutes: (existing && existing[i] && existing[i].minutes !== undefined) ? existing[i].minutes : ''
             }));
+            const buildAccidentDetails = (n, existing) => Array.from({ length: n }, (_, i) => ({
+                severity: (existing && existing[i] && existing[i].severity) || 'moderado',
+                description: (existing && existing[i] && existing[i].description) || ''
+            }));
+            const buildMechFailureDetails = (n, existing) => Array.from({ length: n }, (_, i) => ({
+                route: (existing && existing[i] && existing[i].route) || '',
+                unitId: (existing && existing[i] && existing[i].unitId !== undefined) ? existing[i].unitId : '',
+                description: (existing && existing[i] && existing[i].description) || ''
+            }));
+            const DETAIL_SHAPE_BUILDERS = { accidents: buildAccidentDetails, mechanicalFailures: buildMechFailureDetails };
 
             const [formData, setFormData] = useState(() => {
                 const base = {
@@ -837,6 +899,7 @@
                     safetyScore: initialData?.safetyScore !== undefined ? initialData.safetyScore : 100,
                     onTimeStarts: initialData?.onTimeStarts !== undefined ? initialData.onTimeStarts : 100,
                     accidents: initialData?.accidents || 0,
+                    mechanicalFailures: initialData?.mechanicalFailures || 0,
 
                     // Quejas
                     route: initialData?.route || '',
@@ -851,6 +914,8 @@
                     base[f.key] = n;
                     base[f.key + 'Details'] = buildDetails(n, initialData?.[f.key + 'Details']);
                 });
+                base.accidentsDetails = buildAccidentDetails(base.accidents, initialData?.accidentsDetails);
+                base.mechanicalFailuresDetails = buildMechFailureDetails(base.mechanicalFailures, initialData?.mechanicalFailuresDetails);
                 return base;
             });
 
@@ -858,7 +923,8 @@
 
             const handleCountChange = (field, value) => {
                 const n = Math.max(0, parseInt(value) || 0);
-                setFormData(p => ({ ...p, [field]: value, [field + 'Details']: buildDetails(n, p[field + 'Details']) }));
+                const builder = DETAIL_SHAPE_BUILDERS[field] || buildDetails;
+                setFormData(p => ({ ...p, [field]: value, [field + 'Details']: builder(n, p[field + 'Details']) }));
             };
 
             const handleDetailChange = (field, idx, key, value) => {
@@ -893,8 +959,20 @@
                                 <>
                                     <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded border">
                                         <div><label className="text-xs font-bold text-slate-500">Turno</label><select name="shift" value={formData.shift} onChange={handleChange} className="w-full border rounded p-1 text-sm"><option>T1</option><option>T2</option><option>T3</option></select></div>
-                                        <div><label className="text-xs font-bold text-slate-500">Percances</label><input type="number" name="accidents" value={formData.accidents} onChange={handleChange} className="w-full border rounded p-1 text-sm"/></div>
+                                        <div><label className="text-xs font-bold text-slate-500">Percances (Accidentes)</label><input type="number" min="0" name="accidents" value={formData.accidents} onChange={e => handleCountChange('accidents', e.target.value)} className="w-full border rounded p-1 text-sm"/></div>
+                                        <div className="col-span-2">
+                                            <AccidentDetails field="accidents" details={formData.accidentsDetails} onDetailChange={handleDetailChange} />
+                                        </div>
                                     </div>
+
+                                    <div className="border border-indigo-100 p-3 bg-indigo-50/40 rounded">
+                                        <div className="flex justify-between items-center gap-2 mb-1">
+                                            <h4 className="text-sm font-bold text-indigo-600">Fallas Mecánicas <span className="font-normal text-indigo-300">(ruta, ID de unidad y descripción por cada una)</span></h4>
+                                            <input type="number" min="0" value={formData.mechanicalFailures} onChange={e => handleCountChange('mechanicalFailures', e.target.value)} className="w-14 border rounded text-center text-sm"/>
+                                        </div>
+                                        <MechanicalFailureDetails field="mechanicalFailures" details={formData.mechanicalFailuresDetails} onDetailChange={handleDetailChange} />
+                                    </div>
+
                                     <div className="border border-amber-100 p-3 bg-amber-50/40 rounded">
                                         <h4 className="text-sm font-bold text-amber-600 mb-2 border-b border-amber-200 pb-1">Inicios Tarde <span className="font-normal text-amber-400">(ruta y minutos por cada uno)</span></h4>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
