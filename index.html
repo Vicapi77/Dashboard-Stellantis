@@ -958,7 +958,7 @@
                             {tab === 'incident' && (
                                 <>
                                     <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded border">
-                                        <div><label className="text-xs font-bold text-slate-500">Turno</label><select name="shift" value={formData.shift} onChange={handleChange} className="w-full border rounded p-1 text-sm"><option>T1</option><option>T2</option><option>T3</option></select></div>
+                                        <div><label className="text-xs font-bold text-slate-500">Turno</label><select name="shift" value={formData.shift} onChange={handleChange} className="w-full border rounded p-1 text-sm"><option value="T1">T1 - 1er turno</option><option value="MM">Mixto de Mañana</option><option value="T2">T2 - 2do turno</option><option value="MT">Mixto de Tarde</option><option value="T3">T3 - 3er turno</option></select></div>
                                         <div><label className="text-xs font-bold text-slate-500">Percances (Accidentes)</label><input type="number" min="0" name="accidents" value={formData.accidents} onChange={e => handleCountChange('accidents', e.target.value)} className="w-full border rounded p-1 text-sm"/></div>
                                         <div className="col-span-2">
                                             <AccidentDetails field="accidents" details={formData.accidentsDetails} onDetailChange={handleDetailChange} />
