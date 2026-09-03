@@ -106,6 +106,9 @@
             { key: 'causeNoImpProtest', label: 'Manifestación' }, { key: 'causeNoImpPublicWork', label: 'Obra Publica' }, { key: 'causeNoImpThirdPartyCrash', label: 'Acc. Terceros' }, { key: 'causeNoImpOther', label: 'Otros' }
         ];
         const DETAIL_TRACKED_FIELDS = [...LATE_FIELDS, ...IMP_FIELDS, ...NOIMP_FIELDS].map(f => f.key);
+        // Todos los campos numéricos de conteo de un reporte de incidencias (usados para dejarlos vacíos
+        // por defecto en un reporte nuevo, y para el botón "Rellenar vacíos con 0" antes de guardar).
+        const COUNT_FIELDS = ['accidents', 'mechanicalFailures', ...DETAIL_TRACKED_FIELDS];
         const { weeksDef: WEEKS_DEF } = (() => {
             const weeks = {}; let currentDate = new Date(2025, 10, 17); // Lunes 17 Nov 2025
             let weekCounter = 47; let yearForWeek = 2025; let dayCount = 0; let currentWeekKey = '';
@@ -890,6 +893,11 @@
             }));
             const DETAIL_SHAPE_BUILDERS = { accidents: buildAccidentDetails, mechanicalFailures: buildMechFailureDetails };
 
+            // Un reporte NUEVO (sin initialData) arranca con los campos de conteo VACÍOS (no en 0), para que
+            // se note a simple vista cuáles se capturaron a mano; al editar un reporte ya guardado sí se
+            // muestra su valor real (incluyendo ceros confirmados). "Rellenar vacíos con 0" completa el resto
+            // justo antes de guardar, para no obligar a escribir 0 en cada uno de los ~27 campos.
+            const blankIfNew = (v) => initialData ? (v !== undefined && v !== null ? v : 0) : (v !== undefined && v !== null ? v : '');
             const [formData, setFormData] = useState(() => {
                 const base = {
                     date: initialData ? parseDate(initialData.date) : new Date().toISOString().split('T')[0],
@@ -898,8 +906,8 @@
                     serviceLevel: initialData?.serviceLevel !== undefined ? initialData.serviceLevel : 99.0,
                     safetyScore: initialData?.safetyScore !== undefined ? initialData.safetyScore : 100,
                     onTimeStarts: initialData?.onTimeStarts !== undefined ? initialData.onTimeStarts : 100,
-                    accidents: initialData?.accidents || 0,
-                    mechanicalFailures: initialData?.mechanicalFailures || 0,
+                    accidents: blankIfNew(initialData?.accidents),
+                    mechanicalFailures: blankIfNew(initialData?.mechanicalFailures),
 
                     // Quejas
                     route: initialData?.route || '',
@@ -911,13 +919,23 @@
                 };
                 [...LATE_FIELDS, ...IMP_FIELDS, ...NOIMP_FIELDS].forEach(f => {
                     const n = initialData?.[f.key] || 0;
-                    base[f.key] = n;
+                    base[f.key] = blankIfNew(initialData?.[f.key]);
                     base[f.key + 'Details'] = buildDetails(n, initialData?.[f.key + 'Details']);
                 });
-                base.accidentsDetails = buildAccidentDetails(base.accidents, initialData?.accidentsDetails);
-                base.mechanicalFailuresDetails = buildMechFailureDetails(base.mechanicalFailures, initialData?.mechanicalFailuresDetails);
+                base.accidentsDetails = buildAccidentDetails(initialData?.accidents || 0, initialData?.accidentsDetails);
+                base.mechanicalFailuresDetails = buildMechFailureDetails(initialData?.mechanicalFailures || 0, initialData?.mechanicalFailuresDetails);
                 return base;
             });
+
+            // Completa con 0 cualquier campo de conteo que se haya quedado vacío (sin tocar), justo antes de
+            // guardar o cuando el operador lo pide explícitamente con el botón "Rellenar vacíos con 0".
+            const fillEmptyCountsWithZero = () => {
+                setFormData(p => {
+                    const next = { ...p };
+                    COUNT_FIELDS.forEach(key => { if (next[key] === '' || next[key] === undefined || next[key] === null) next[key] = 0; });
+                    return next;
+                });
+            };
 
             const handleChange = (e) => setFormData(p => ({ ...p, [e.target.name]: e.target.value }));
 
@@ -1021,8 +1039,15 @@
                                 </div>
                             )}
                         </form></div>
-                        <div className="p-4 border-t bg-slate-50 flex justify-between">
-                            {!initialData ? <button type="button" onClick={onSeed} className="text-xs text-slate-400 flex gap-1 items-center"><Icons.CloudUpload/> Demo</button> : <div></div>}
+                        <div className="p-4 border-t bg-slate-50 flex justify-between items-center flex-wrap gap-2">
+                            <div className="flex items-center gap-2">
+                                {!initialData && <button type="button" onClick={onSeed} className="text-xs text-slate-400 flex gap-1 items-center"><Icons.CloudUpload/> Demo</button>}
+                                {tab === 'incident' && (
+                                    <button type="button" onClick={fillEmptyCountsWithZero} title="Marca en 0 todos los campos de conteo que dejaste en blanco, sin tocar los que ya capturaste" className="text-xs font-semibold text-emerald-700 flex gap-1.5 items-center bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1.5 rounded">
+                                        <Icons.CheckCircle/> Rellenar vacíos con 0
+                                    </button>
+                                )}
+                            </div>
                             <div className="flex gap-2"><button type="button" onClick={close} className="px-4 py-2 rounded text-sm hover:bg-slate-200">Cancelar</button><button type="submit" form="f" className="px-4 py-2 rounded text-sm bg-rose-600 text-white hover:bg-rose-700 shadow">{initialData ? 'Actualizar' : 'Guardar'}</button></div>
                         </div>
                     </div>
